@@ -1,0 +1,57 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+	background-color: rgb(106, 106, 106);
+}
+progress {
+    display: block;
+    width: 60%;
+    height: 20px;
+    position: fixed;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+}
+
+ul {
+    list-style: none;
+	position: absolute;
+    background-color: transparent;
+    left:50%;
+    top:50%;
+    transform:translateX(-50%) translateY(-50%);
+}
+
+li {
+    display: inline-block;
+    position: absolute;
+    transition: all 1s ease;
+    -webkit-transition: all 1s ease;
+    -moz-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    width: 20px;
+}
+.btn{
+	display: block;
+	width: 60px;
+	height: 40px;
+	z-index: 100;
+	background: rgba(10, 10, 10, 0.22);
+	position: absolute;
+	text-align: center;
+	transition: all 0.2s;
+	cursor: pointer;
+}
+.btn:hover{
+	background: rgba(10,10,10,0.5);
+}
+.img{
+	margin-top: 4px;/*用行高就能解决的问题不知道为什么今天不行了*/
+}
+.inner{
+	width: 100%;
+	height: 100%;
+}

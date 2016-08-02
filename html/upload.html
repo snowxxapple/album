@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>上传图片</title>
+    <link rel="stylesheet" type="text/css" href="../css/upload.css">
+</head>
+
+<body>
+    <!-- 提交表单时，需要提交到后台的数据，要给对应表单元素添加name属性，否则后台是拿不到的
+ -->
+    <div class='file-box'>
+        <form enctype="multipart/form-data" name='upImg' id='formData'>
+            <fieldset>
+                <legend>上传图片</legend>
+                <div class='box_img'>
+                    <div id='showImg'>
+                        <img src="../js/img/load.png">                     
+                    </div>
+                    <label style='color:#cdcdcd;'>预览</label>
+                </div>
+                
+                <div class='form-group'>
+                    <label>选择相册：</label>
+                    <select id='sele' name='tag'>
+                    </select>
+                    <br>
+                </div>
+                <div class='form-group' style='position:relative;'>
+                    <input type='button' value='选择文件' class='btn_new'>
+                    <input type='text' id='textfield' class='txt' readonly='readonly'>
+                    <input type='file' name='upload' id='upImg'>
+                </div>
+                <div class='form-group'>
+                    <label>添加描述：</label>
+                    <textarea name='description' id='desc' cols='6' rows='2' class='form-control'></textarea>
+                </div>
+                <div class='form-group'>
+                    <input type='button' value='上传' id='btn' class='btn btn-info'>
+                    <progress style='display:inline-block'></progress>
+                    <img src="" id='mImg'>
+                    <div id='info' style='display:inline-block'></div>
+                   
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class='mask' style='display:none;'></div>
+    <div class='alert' style='display:none;'>
+        <div style='overflow:auto'>
+            <strong class='mention'>提示信息</strong>
+            <button type='button' id='btn2' class='btn' style='float:right;'>&times;</button>
+            <br>
+        </div>
+        <hr>
+        <strong class='mt_body'></strong>
+    </div>
+    <div class='alert' style='display:none;'>
+        <div style='overflow:auto'>
+            <strong>提示信息</strong>
+        </div>
+        <hr>
+        <strong class='mt_body'>本次图片和上次相同，确认上传吗</strong>
+        <div>
+            <button id='btn_succ' class='btn_new' style='float:left'>确认上传</button>
+            <button id='btn_cancle' class='btn_new' style='float:right'>取消上传</button>
+        </div>
+    </div>
+    <script type="text/javascript" src='../js/jquery-1.11.2.min.js'></script>
+    <script type="text/javascript">
+    $.ajax({
+            url: '/api/upload',
+            type: 'GET',
+            dataType: 'json',
+        })
+        .done(function(data) {
+            console.log("success");
+            console.log(data);
+            //向select中添加option
+            var oSelect = document.getElementById('sele');
+            var data = data;
+            for (var i = 0; i < data.length; i++) {
+                var newOption = new Option(data[i].tag, data[i].tag);
+                oSelect.appendChild(newOption);
+            }
+        })
+        .fail(function() {
+            console.log("error");
+        });
+    window.onload = function() {
+        var result = document.getElementById('showImg');
+        var input = document.getElementById('upImg');
+        var oBtn = document.getElementById('btn');
+        var oMask = document.getElementsByClassName('mask')[0];
+        var oAlert = document.getElementsByClassName('alert');
+        var msg = oAlert[0].getElementsByTagName('strong')[1];
+        var oBtn2 = document.getElementById('btn2');
+        var body = document.getElementsByTagName('body')[0];
+        var oProgress = document.getElementsByTagName('progress')[0];
+        var info = document.getElementById('info');
+        var mImg = document.getElementById('mImg');
+        var desc = document.getElementById('desc');
+        var btn_succ = document.getElementById('btn_succ');
+        var btn_cancle = document.getElementById('btn_cancle');
+        var content = [];
+        var file;
+        var txt = document.getElementById('textfield');
+        // console.log(input.files[0], 'input');
+        input.addEventListener('change', readFile, false);
+        body.addEventListener('click', mention, false);
+
+        function hide() {
+            info.innerHTML = '';
+            oProgress.value = 0;
+            mImg.src = '';
+            showImg.innerHTML = '';
+        }
+
+        function readFile() {
+            console.log('change');
+            file = this.files[0];
+            // console.log(file, 'file');
+            hide();
+            if (file) {
+                //图片类型：.jpg .jp2 .jpe .png .tif .tiff .gif 
+                //type表现为：image/英文字母拼写
+                if (!/image\/\w+/.test(file.type)) {
+                    oBtn.disabled = true;
+                    msg.innerHTML = '文件必须为图片格式';
+                    oMask.style.display = 'block';
+                    oAlert[0].style.display = 'block';
+                    txt.value='';
+                    //当上传文件不是图片时，一定要把file对象置空，并且把input的value置空，因为下面使用Input的value值来判断是否上传了文件的
+                    file=null;
+                    input.value='';
+                    result.innerHTML="<img src='../js/img/load.png'>";
+                    return false; //返回了函数而已
+                }
+                oBtn.disabled = false;
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(e) {
+                    console.log(this);
+                    console.log(e, 'img');
+                    // console.log(e, 'e');
+                    txt.value = input.value;
+                    var img = document.createElement('img');
+                    img.src = this.result;
+                    var that = this;
+                    img.onload = function() {
+                        var ratio = this.naturalWidth / this.naturalHeight;
+                        if (ratio > 1) {
+                            var height = 200/ ratio;
+                            result.innerHTML = "<img src=" + that.result + " style=height:" + height + "px;>";
+                        }
+                        if (ratio <= 1) {
+                            var width = ratio * 200;
+                            result.innerHTML = "<img src=" + that.result + " style=width:" + width + "px;>";
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        function mention(ev) {
+            if (ev.target == oBtn) {
+                console.log('上传按钮');
+                //是为了防止重复提交 但是底下不提交 显示提示信息并按下相应按钮后要记得把按钮设置成可点状态
+                oBtn.disabled = true;
+                console.log(input.value, 'input.value');
+                //判断file是否为空 采用value的方法 file的value中存储的是上传文件的路径
+                if (input.value == '') {
+                    oMask.style.display = 'block';
+                    msg.innerHTML = '没有选择图片';
+                    oAlert[0].style.display = 'block';
+                    result.innerHTML="<img src='../js/img/load.png'>";
+                } else {
+                    //一定是上传了文件的
+                    var fileName = input.value;
+                    content.push(fileName);
+                    if (content.length > 2) {
+                        console.log('长度大于二');
+                        content.shift();
+                    }
+                    console.log(content, 'content');
+                    if (content[0] != content[1]) {
+                        console.log('上传');
+                        upLoad();
+                    }
+                    if (content[0] == content[1]) {
+                        console.log('相同');
+                        oMask.style.display = 'block';
+                        oAlert[1].style.display = 'block';
+                    }
+                }
+
+            }
+            if (ev.target == oBtn2 || ev.target == oMask) {
+                oBtn.disabled = false;
+                oMask.style.display = 'none';
+                oAlert[0].style.display = 'none';
+            }
+            if (ev.target == btn_succ) {
+                oMask.style.display = 'none';
+                oAlert[1].style.display = 'none';
+                oProgress.value = 0;
+                info.innerHTML = '';
+                upLoad();
+            }
+            if (ev.target == btn_cancle) {
+                oBtn.disabled = false;
+                oMask.style.display = "none";
+                oAlert[1].style.display = 'none';
+                mImg.src = '';
+                oProgress.value = '';
+                info.innerHTML = '';
+            }
+            if (ev.target == input) {
+                // console.log()
+                console.log('')
+                mImg.src = '';
+                info.innerHTML = '';
+                oProgress.value = 0;
+            }
+            if (ev.target == oMask) {
+                oBtn.disabled = false;
+                oMask.style.display = 'none';
+                oAlert[0].style.display = 'none';
+            }
+        }
+
+        function upLoad() {
+            //禁用提交按钮 防止重复提交
+            console.log('上传函数');
+            oBtn.disabled = true;
+            var oForm = new FormData(document.getElementById('formData'));
+            // console.log(oForm, 'form');
+            $.ajax({
+                    url: '/html/upload.html',
+                    type: 'POST',
+                    cache: false,
+                    processData: false, //必须false才会自动加上正确的Content-type 因为使用了FormData对象
+                    contentType: false,
+                    data: oForm,
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                oProgress.value = percentComplete;
+                                // console.log(percentComplete,'percent');
+                            }
+                        }, false);
+                        return xhr;
+                    }
+                })
+                .done(function(data) {
+                    console.log("success");
+                    console.log(data, 'data');
+                    console.log(typeof data);
+                    // console.log(data); 
+                    if(data==-1){
+                        msg.innerHTML='只能上传图片';
+                        oMask.style.display='block';
+                        oAlert[0].style.display='block';
+                    }else{
+                        oBtn.disabled = false;
+                        info.innerHTML = JSON.parse(data);
+                        mImg.src = '../js/img/success.png';
+                    }          
+                })
+                .fail(function(data) {
+                    console.log(data, 'fail');
+                    msg.innerHTML = data;
+                    oMask.style.display = 'block';
+                    oAlert.style.display = 'block';
+                });
+        }
+    }
+    </script>
+</body>
+
+</html>

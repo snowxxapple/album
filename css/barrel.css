@@ -1,0 +1,36 @@
+*{
+	margin: 0px;
+	padding: 0px;
+	box-sizing:border-box;
+}
+body{
+	overflow-y:scroll;
+}
+/*.imgRow{
+	margin-bottom:8px;
+}*/
+.imgBox{
+	float:left;
+	/*padding-left: 8px;*/
+	border-radius: 4px;
+}
+.imgBox:first-child{
+	padding-left: 0px;
+}
+.rowContainer{
+	/*padding:8px;*/
+	width:100%;
+}
+progress{
+	display: none;
+	position: fixed;
+	width:60%;
+	height: 20px;
+	left: 50%;
+	transform:translateX(-50%);
+	bottom: 10px;
+}
+img{
+	border-radius: 4px;
+	cursor:url(../js/img/enlarge2.png),pointer;
+}

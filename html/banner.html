@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>轮播图展示</title>
+    <link rel="stylesheet" type="text/css" href="../css/banner.css">
+    <link rel="stylesheet" type="text/css" href="../css/aside.css">
+</head>
+
+<body>
+    <progress value='0'></progress>
+    <ul></ul>
+    <script type="text/javascript" src='../js/xhr.js'></script>
+    <script type="text/javascript" src='../js/show.js'></script>
+    <script type="text/javascript" src='../js/aside.js'></script>
+    <script type="text/javascript">
+    var fn = {
+        success: function(data) {
+            console.log("success");
+            var data = JSON.parse(data);
+            data.shift();
+            console.log(data);
+            //创建图片
+            create(data);
+        },
+        fail: function(data) {
+            console.log('fail');
+            aleft(data);
+        }
+    };
+
+    function create(data) {
+        var imgArr = []; //存放图片src
+        var oUl = document.getElementsByTagName('ul')[0];
+        var oFrag = document.createDocumentFragment();
+        var count = 0;
+        var oProgress = document.getElementsByTagName('progress')[0];
+        for (var i = 0; i < data.length; i++) {
+            imgArr.push(data[i].src);
+        }
+        var newArr=imgArr.splice(3,9);
+        for (var j = 0; j < newArr.length; j++) {
+            var oLi = document.createElement('li');
+            var oImg = document.createElement('img');
+            oImg.src = newArr[j];
+            oImg.className = 'inner';
+            oLi.appendChild(oImg);
+            oFrag.appendChild(oLi);
+            oImg.onload = function() {
+                count++;
+                oProgress.value = count / newArr.length;
+                if (count == newArr.length) {
+                    count = 0;
+                    // mask.method1();
+                    aside.asideBar();
+                    oProgress.style.display = 'none';
+                    oUl.appendChild(oFrag);
+                    modle.method(newArr.length, 1000, 400, 300);
+                    modle.auto();
+                }
+            }
+        }
+
+    }
+    ajax({
+        "method": "GET",
+        "sync": true,
+        "url": "/api/getImg",
+        "data": {
+            "start": 1,
+            "tag": "测试相册"
+        },
+        "success": fn.success,
+        "fail": fn.fail
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+*{
+	margin:0px;
+	padding:0px;
+	box-sizing:border-box;
+}
+body{
+	overflow-y:scroll;
+}
+
+@media (min-width:768px){
+	.img-container{
+		width:760px;
+	}
+}
+@media (min-width:992px){
+	.img-container{
+		width:990px;
+	}
+}
+@media (min-width: 1200px){
+	.img-container{
+		width:1180px;
+	}
+}
+.img-container{
+	overflow:auto;
+	margin: auto;
+}
+.boxContainer{
+	float: left;
+}
+.imgContent{
+	display: block;
+	border-radius: 6px 6px 0px 0px;
+	cursor:url(../js/img/enlarge2.png),pointer;
+}
+.imgInfo{
+	border-radius:0px 0px 6px 6px;
+	padding:3px;
+	font-size: 18px;
+}
+.imgTag{
+	padding:3px;
+}
+
+.img-box{
+	border:1px solid rgba(128, 128, 128, 0.49);
+	border-radius:6px;
+}
+.img{
+	display: block;
+}
+progress{
+	width:60%;
+	height: 20px;
+	position: fixed;
+	bottom: 20px;
+	left:50%;
+	transform:translateX(-50%);
+	display: none;
+}
