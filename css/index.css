@@ -3,17 +3,22 @@
     padding: 0;
     box-sizing: border-box;
 }
-body{
-    cursor:url(../js/img/snow9.png),auto;
+
+body {
+    cursor: url(../js/img/snow9.png), auto;
+    overflow-x: hidden;
 }
+
 nav {
     width: 100%;
     height: 45px;
     padding: 10px 50px;
     background-color: rgba(255, 192, 203, 0.33);
     position: absolute;
-    line-height: 25px;/*对于一行的行内元素 可以通过行高来设置*/
+    line-height: 25px;
+    /*对于一行的行内元素 可以通过行高来设置*/
 }
+
 ul {
     list-style: none;
     /*删除小圆点*/
@@ -22,16 +27,21 @@ ul {
 li {
     display: inline-block;
 }
+
 img {
     width: 100%;
     height: 100%;
 }
+
 a {
     text-decoration: none;
-    color:black;
-    cursor:pointer;
+    color: black;
+    cursor: pointer;
 }
+
+
 /*开始动画*/
+
 progress {
     width: 50%;
     height: 20px;
@@ -41,50 +51,54 @@ progress {
     transform: translateX(-50%);
     margin-bottom: -10px;
 }
+
 .loadMask {
     position: fixed;
     left: 0px;
     top: 0px;
     z-index: 10;
-    background-color: pink;
+    background: -webkit-linear-gradient(left, #ace, pink);
+    ;
     display: block;
     width: 100%;
     height: 100%;
 }
+
+
 /*鼠标指针*/
-.mouse{
+
+.mouse {
     display: inline-block;
     background: url(../js/img/snow8.png);
     position: fixed;
     width: 32px;
     height: 32px;
-    left:-32px;
-    top:-32px;
-    transition:all 0.2s ease-out;
+    left: -32px;
+    top: -32px;
+    transition: all 0.2s ease-out;
 }
+
+
 /*下拉列表*/
+
 .drop_ul {
     display: none;
     width: 180px;
     position: absolute;
-    top:45px;
-    right:0;
+    top: 45px;
+    right: 0;
     margin-right: 50px;
     z-index: 100;
-
 }
+
 a.vertical_li {
     color: #555;
     display: block;
     padding: 10px 15px;
     margin-bottom: -1px;
-/*    消除上下两个1px的border重合 
-*/ 
+    /*  消除上下两个1px的border重合 */
     background-color: rgba(255, 192, 203, 0.33);
     border: 1px solid #ddd;
-    /*给li设置边框*/
-/*    background-color: white;
-*/   /* color: #555;*/
     color: #bfe4e6;
     cursor: pointer;
     font-weight: bolder;
@@ -96,6 +110,7 @@ a.vertical_li:focus {
     background-color: #428bca;
     color: white;
 }
+
 a.vertical_li:first-child {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -105,8 +120,13 @@ a.vertical_li:last-child {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 }
+
+
 /*导航栏*/
+
+
 /*向下箭头*/
+
 .arrow {
     display: inline-block;
     width: 0;
@@ -116,9 +136,12 @@ a.vertical_li:last-child {
     border-top: 4px solid;
     border-right: 4px solid transparent;
     border-left: 4px solid transparent;
-    color:white;
+    color: white;
 }
+
+
 /*抖动效果*/
+
 @keyframes buzz {
     0% {
         transform: translateY(1px) rotate(1deg);
@@ -154,6 +177,7 @@ a.vertical_li:last-child {
         transform: translateY(1px) rotate(1deg);
     }
 }
+
 @-webkit-keyframes buzz {
     0% {
         transform: translateY(1px) rotate(1deg);
@@ -189,6 +213,7 @@ a.vertical_li:last-child {
         transform: translateY(1px) rotate(1deg);
     }
 }
+
 @-moz-keyframes buzz {
     0% {
         transform: translateY(1px) rotate(1deg);
@@ -224,6 +249,7 @@ a.vertical_li:last-child {
         transform: translateY(1px) rotate(1deg);
     }
 }
+
 @-o-keyframes buzz {
     0% {
         transform: translateY(1px) rotate(1deg);
@@ -259,50 +285,53 @@ a.vertical_li:last-child {
         transform: translateY(1px) rotate(1deg);
     }
 }
-.logo{
+
+.logo {
     display: inline-block;
     font-weight: bolder;
     color: white;
     position: absolute;
     float: left;
-     border-radius: 4px;
-    border:2px solid white;
+    border-radius: 4px;
+    border: 2px solid white;
 }
-.logo:hover{
-    color:#bfe4e6;
-    animation:buzz 1s ease 0s 1 normal;
-    -webkit-animation:buzz 1s ease 0s 1 normal;
+
+.logo:hover {
+    color: #bfe4e6;
+    animation: buzz 1s ease 0s 1 normal;
+    -webkit-animation: buzz 1s ease 0s 1 normal;
 }
+
+
 /*雪花*/
-.snowSm{
+
+.snowSm {
     display: inline-block;
     position: absolute;
-    width:16px;
+    width: 16px;
     height: 16px;
-    transform:scale(0);
-    left:150px;
-    top:30px;
-/*    transition:width 2s ease-in,height 1s ease-in,left 2s ease-in,top 2s ease-in;  
-*/
-    transition:all 0.5s linear;
+    transform: scale(0);
+    left: 150px;
+    top: 30px;
+    transition: all 0.5s linear;
 }
-.snowLg{
+
+.snowLg {
     display: inline-block;
     position: absolute;
-    width:16px;
+    width: 16px;
     height: 16px;
-    left:150px;
-    top:30px;
-    transform:scale(0);
-/*    transition:width 2s ease-in,height 1s ease-in,left 2s ease-in,top 2s ease-in;  
-*/
-    transition:all 0.5s linear;
+    left: 150px;
+    top: 30px;
+    transform: scale(0);
+    transition: all 0.5s linear;
 }
-/*nav*/
-.nav_ul{
+
+.nav_ul {
     display: inline-block;
     float: right;
 }
+
 .line_li {
     border: 2px solid rgba(255, 255, 255, 0.8);
     padding: 5px 5px;
@@ -312,11 +341,15 @@ a.vertical_li:last-child {
     cursor: pointer;
     font-weight: bolder;
 }
-.line_li:hover{
-    border:2px solid white;
-    color:#bfe4e6;
+
+.line_li:hover {
+    border: 2px solid white;
+    color: #bfe4e6;
 }
+
+
 /*背景层*/
+
 .mask_div {
     width: 100%;
     height: 100%;
@@ -340,7 +373,10 @@ a.vertical_li:last-child {
 .album {
     position: relative;
 }
+
+
 /*album 页面布局*/
+
 .album div {
     position: absolute;
 }
@@ -456,19 +492,25 @@ a.vertical_li:last-child {
 
 /*奇怪了，正着选选不上
 */
+
 body div.album:nth-last-of-type(6) {
     z-index: -1;
 }
+
+
 /*幽灵按钮*/
 
 body div.album:nth-last-of-type(1) {
     width: 100%;
     background-color: black;
     position: relative;
-    background:url('../backimg/back8.jpg');
+    background: url('../backimg/back8.jpg');
     background-size: 100% 100%;
 }
+
+
 /*幽灵按钮*/
+
 .button-box {
     width: 100%;
     height: 100%;
@@ -504,11 +546,11 @@ body div.album:nth-last-of-type(1) {
     display: block;
     width: 80%;
     height: 50%;
-    margin:auto;
-    margin-top:20px;
+    margin: auto;
+    margin-top: 20px;
     position: relative;
-    
 }
+
 .link-more .icon {
     background: url('../js/img/more3.png') no-repeat center center;
 }
@@ -525,6 +567,7 @@ body div.album:nth-last-of-type(1) {
     transform: rotate(360deg) scale(1.2);
     transition: transform 0.2s linear;
 }
+
 .button {
     display: block;
     width: 180px;
@@ -535,17 +578,19 @@ body div.album:nth-last-of-type(1) {
     font-weight: bolder;
     border: 2px solid rgba(255, 255, 255, 0.8);
     padding-left: 20px;
-    position: relative;/*外层容器定位必须不能是static才能使四条边线的绝对定位相对于按钮*/
+    position: relative;
+    /*外层容器定位必须不能是static才能使四条边线的绝对定位相对于按钮*/
     background: url('../js/img/jiantou.png') no-repeat 125px center;
     transition: 0.4s ease;
     margin: auto;
-    margin-top:30px;
-    margin-bottom:20px;
+    margin-top: 30px;
+    margin-bottom: 20px;
 }
 
 .button:hover {
     border: 2px solid white;
-    background-position: 140px center;/*通过移动背景图片位置来达到移动效果*/
+    background-position: 140px center;
+    /*通过移动背景图片位置来达到移动效果*/
     color: rgb(4, 249, 108);
 }
 
@@ -607,78 +652,87 @@ body div.album:nth-last-of-type(1) {
     height: 100%;
     top: 0px;
 }
+
+
 /*footer*/
-footer{
-	width: 100%;
-	text-align: center;
-	background-color: #98a3c5;
-	color: white;
-	font-weight: bold;
+
+footer {
+    width: 100%;
+    text-align: center;
+    background-color: #98a3c5;
+    color: white;
+    font-weight: bold;
 }
+
+
 /*轮播图*/
-.banner-div{
+
+.banner-div {
     overflow: hidden;
 }
 
-.banner_ul{
+.banner_ul {
     list-style: none;
     position: absolute;
     height: 100%;
-    transition:left 1s ease-in;
-
+    transition: left 1s ease-in;
 }
-.banner_ul>li{
+
+.banner_ul>li {
     float: left;
     height: 100%;
 }
-.banner_btn{
+
+.banner_btn {
     position: absolute;
     width: 80px;
-    left:50%;
-    bottom:10%;
-    transform:translateX(-50%);
+    left: 50%;
+    bottom: 10%;
+    transform: translateX(-50%);
     cursor: auto;
 }
-.banner_img{
+
+.banner_img {
     cursor: auto;
 }
-.banner_btn>a{
+
+.banner_btn>a {
     display: inline-block;
     border-radius: 5px;
     width: 8px;
     height: 8px;
     background-color: white;
-    margin:3px 3px;
+    margin: 3px 3px;
     cursor: pointer;
 }
-.banner_btn>a:hover{
+
+.banner_btn>a:hover {
     background-color: grey;
 }
-.common_img:hover{
-/*    border:4px solid white;
-*/    cursor: pointer;
-}
-/*.first-left:hover,.second-left>div:first-child:hover,.second-left>div:last-child:hover,.second-right:hover,.third-middle:hover{
-    border:4px solid rgba(255,255,255,0.5);
-}*/
-.des_div{
-    position: absolute;
-    bottom:-5%;
-    width: 100%;
-    height: 0%;
-    font-size: 16px;
-    font-weight: bolder;
-    background-color: rgba(255,255,255,0.5);
-    padding:2px 15px;
-    transition:all 0.2s ease-in;
-}
-.fourth-left{
-    overflow: hidden;
-}
-.fourth-left>img:hover{
+
+.common_img:hover {
     cursor: pointer;
 }
+
+.des_div {
+    position: absolute;
+    bottom: -6px;
+    width: 100%;
+    height: 0;
+    font-size: 16px;
+    font-weight: bolder;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 2px 15px;
+    transition: all 0.2s ease-in;
+}
+
+.fourth-left {
+    overflow: hidden;
+}
+
+
 /*放大缩小类*/
+
 .plus {
     transform: scale(1.5);
     transition: all 8s linear;
@@ -688,8 +742,11 @@ footer{
     transform: scale(1);
     transition: all 8s linear;
 }
+
+
 /*回到顶部按钮*/
-.goTop{
+
+.goTop {
     display: none;
     width: 45px;
     height: 70px;
@@ -698,12 +755,14 @@ footer{
     position: fixed;
     bottom: 100px;
     right: 0px;
-    z-index: 50;
+    z-index: 9;
 }
-.goTop:hover{
+
+.goTop:hover {
     cursor: pointer;
 }
-.goTop>img{
+
+.goTop>img {
     display: inline;
     width: 32px;
     height: 32px;
@@ -711,18 +770,22 @@ footer{
     left: 50%;
     top: 50%;
     margin-left: -16px;
-    margin-top:-16px;
+    margin-top: -16px;
 }
+
+
 /*打字效果实现*/
-.typeBox{
-    width:40%;
-    height: 40%;
+
+.typeBox {
+    width: 60%;
+    height: 60%;
     position: absolute;
     left: 50%;
-    top:30%;
-    transform:translateX(-50%);
+    top: 30%;
+    transform: translateX(-50%);
 }
-#typeIn{
+
+#typeIn {
     display: block;
     width: 100%;
     font-size: 40px;
@@ -730,5 +793,3 @@ footer{
     color: white;
     text-align: center;
 }
-
-

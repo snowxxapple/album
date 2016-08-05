@@ -61,7 +61,6 @@ Waterfall.prototype.createCol=function(){
 	var oProgress=document.getElementsByTagName('progress')[0];
 	var body=document.getElementsByTagName('body')[0];
 	body.insertBefore(Water_imgContainer,oProgress);
-	// document.body.appendChild(Water_imgContainer);
 	var width=(100/this.col)+"%";
 	for(var i=0;i<this.col;i++){
 		var boxContainer=creEle('div');

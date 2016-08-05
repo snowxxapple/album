@@ -8,19 +8,25 @@
 <link rel="stylesheet" type="text/css" href="../css/waterfall.css">
 <link rel="stylesheet" type="text/css" href="../css/mask.css">
 <link rel="stylesheet" type="text/css" href="../css/aside.css">
+<link rel="shortcut icon" href="../backimg/logo.ico" />
 
 <body>
-	<progress></progress>
+    <progress></progress>
     <script type="text/javascript" src='../js/aside.js'></script>
     <script type="text/javascript" src='../js/waterfall_new.js'></script>
     <script type="text/javascript" src='../js/mask.js'></script>
     <script type="text/javascript" src='../js/xhr.js'></script>
     <script type="text/javascript">
+    if(!localStorage['albumTag']){
+        localStorage.setItem('albumTag','测试相册');
+    }
+    // console.log(localStorage['albumTag'],'albumTag');
     var fn = {
         success1: function(data) {
             console.log('success');
             console.log(typeof data);
             var data = JSON.parse(data);
+            console.log(data,'data');
             Waterfall.prototype.next = data[0];
             data.shift();
             var waterfall = new Waterfall(5, 16, data);
@@ -33,7 +39,7 @@
         },
         success2: function(data) {
             console.log(data, 'data');
-            var data=JSON.parse(data);
+            var data = JSON.parse(data);
             Waterfall.prototype.next = data[0];
             data.shift();
             var oWater = new Waterfall(5, 16, data);
@@ -46,16 +52,15 @@
         "url": "/api/getImg",
         "data": {
             "start": 1,
-            "tag": "测试相册"
+            "tag": localStorage["albumTag"]
         },
         "success": fn.success1,
         "fail": fn.fail1
     });
     window.onload = function() {
         mask.method1();
-        mask.method2();
         aside.asideBar();
-        Waterfall.prototype.imgLoad = true; //用于判断是否异步加载图片			
+        Waterfall.prototype.imgLoad = true; //用于判断是否异步加载图片          
         window.onscroll = function() {
             var load = Waterfall.prototype.imgLoad;
             var doc = document;
@@ -64,12 +69,22 @@
             // console.log(next,'起始坐标');
             var maxIndex = colHeight.indexOf(Math.max.apply(Math, colHeight));
             var maxHeight = colHeight[maxIndex];
-            
+
             var documentHeight = doc.body.scrollTop + doc.documentElement.clientHeight;
             var flag = documentHeight > (maxHeight - 100) ? true : false;
             if (flag && load) {
                 Waterfall.prototype.imgLoad = false;
-                ajax({"method":"GET","url":"/api/getImg","data":{"start": Number(next),"tag":"测试相册"},"sync":true,"success":fn.success2,"fail":fn.fail1});
+                ajax({
+                    "method": "GET",
+                    "url": "/api/getImg",
+                    "data": {
+                        "start": Number(next),
+                        "tag": localStorage["albumTag"]
+                    },
+                    "sync": true,
+                    "success": fn.success2,
+                    "fail": fn.fail1
+                });
             }
         }
     }

@@ -26,7 +26,6 @@ Barrel.prototype.create = function() {
             img.name = oImg.name;
             img.tag = oImg.tag;
             img.index = oImg.index;
-            // startArr.push(oImg.index);
             img.onload = function() {
                 var _this = this;
                 count = count + 1;
@@ -64,7 +63,6 @@ Barrel.prototype.createBox = function() {
         rowContainer.style.padding = this.space / 2 + 'px';
         rowContainer.style.paddingTop = this.space + 'px';
         document.body.insertBefore(rowContainer, oProgress);
-        // document.body.appendChild(rowContainer);
     }
     //页面布局
 Barrel.prototype.render = function() {
@@ -98,7 +96,6 @@ Barrel.prototype.render = function() {
     // console.log(rows, 'rows');
     // console.log(this.imgSrc[rows[rows.length - 1].rowEnd]);
     //下次拿图片的起始编号为当前所有行中，最后一行的最后一张图片的index+1;
-    // this.imgSrc[rows[rows.length-1].rowEnd]
     var nextIndex = this.imgSrc[rows[rows.length - 1].rowEnd].index + 1; //获得构成行的最后一张图片的标号
     // console.log(nextIndex, 'nextIndex');
     Barrel.prototype.nextIndex = nextIndex;
@@ -113,11 +110,13 @@ Barrel.prototype.render = function() {
             imgBox.style.paddingRight = this.space / 2 + 'px';
             var img = creEle('img');
             img.src = this.imgSrc[n].url;
+            img.className='hoverImg';
             img.style.height = rows[m].lastHeight + 'px';
-            // var showDiv=creEle('div');
-            // showDiv.innerHTML=this.imgSrc[n].name;
+            var showDiv=creEle('div');
+            showDiv.className='showBox';
+            showDiv.innerHTML=this.imgSrc[n].name;
             imgBox.appendChild(img);
-            // imgBox.appendChild(showDiv);
+            imgBox.appendChild(showDiv);
             imgRow.appendChild(imgBox);
         }
         imgRow.style.width = rowContainer.offsetWidth + 'px';

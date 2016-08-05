@@ -7,19 +7,24 @@
     <link rel="stylesheet" type="text/css" href="../css/barrel.css">
     <link rel="stylesheet" type="text/css" href="../css/mask.css">
     <link rel="stylesheet" type="text/css" href="../css/aside.css">
+    <link rel="shortcut icon" href="../backimg/logo.ico" />
 </head>
 
 <body>
-	<progress></progress>
-	<script type="text/javascript" src='../js/aside.js'></script>
+    <progress></progress>
+    <script type="text/javascript" src='../js/aside.js'></script>
     <script type="text/javascript" src='../js/barrel.js'></script>
     <script type="text/javascript" src='../js/xhr.js'></script>
     <script type="text/javascript" src='../js/mask.js'></script>
     <script type="text/javascript">
+     if(!localStorage['albumTag']){
+        localStorage.setItem('albumTag','测试相册');
+    }
+    // console.log(localStorage['albumTag'],'albumTag');
     var fn = {
         success1: function(data) {
             // console.log(data, 'data');
-            var data = JSON.parse(data);//转成对象
+            var data = JSON.parse(data); //转成对象
             data.shift();
             // console.log(data);
             var oBarrel = new Barrel(200, data, 8); //最小行高 数据 留白间距
@@ -31,11 +36,11 @@
             // console.log(data);
             alert("出错啦");
         },
-        success2:function(data){
-        	var data=JSON.parse(data);
-        	data.shift();
-        	var barrel=new Barrel(200,data,8);
-        	barrel.create();
+        success2: function(data) {
+            var data = JSON.parse(data);
+            data.shift();
+            var barrel = new Barrel(200, data, 8);
+            barrel.create();
         }
     };
     ajax({
@@ -44,63 +49,59 @@
         "sync": false,
         "data": {
             "start": 1,
-            "tag": "测试相册"
+            "tag": localStorage["albumTag"]
         },
         "success": fn.success1,
         "fail": fn.fail1
     });
-    window.onload=function(){
-    	aside.asideBar();
-    	Barrel.prototype.imgLoad=true;//用于判断上次图片是否加载完成并渲染完成   	
-    	mask.method2();
-    	mask.method1();
-    	var flag=false;
-    	window.onscroll=function(){
-    		var load=Barrel.prototype.imgLoad;
-    		var doc=document;
-    		var next=Barrel.prototype.nextIndex;
-    		// console.log(next,'next');
-    		var boxHeight=document.getElementsByClassName('rowContainer')[0].offsetHeight;
-    		var documentHeight=doc.body.scrollTop+doc.documentElement.clientHeight;
-    		var flag=documentHeight>(boxHeight-10)?true:false;
-    		console.log(boxHeight,'boxHeight');
-    		console.log(documentHeight,'documentHeight');
-    		console.log(flag,'flag');
-    		console.log(load,'load');
-    		if(flag&&load){
-    			Barrel.prototype.imgLoad=false;
-    			flag=false;
-    			ajax({"method":"GET","url":"/api/getImg","data":{"start":Number(next),"tag":"测试相册"},"sync":true,"success":fn.success2,"fail":fn.fail1});
-    		}
-    	}
-    }
-    // var barrel=new Barrel(200,'http://journey.crystalxue.com/photo/',1,18,8);
-    // barrel.create();
-    // barrel.getImg();
-    // barrel.render();
-    // var nextIndex=barrel.index;
-    // window.onload=function(){
-    // 	window.onscroll=function(){
-    // 		var doc=document;
-    // 		var scrollHeight=doc.body.scrollTop;
-    // 		var windowHeight=doc.body.clientHeight;
-    // 		var height=scrollHeight+windowHeight/2;
-    // 		var rowContainer=doc.getElementsByClassName('rowContainer')[0];
-    // 		//如果鼠标滚动距离加上页面的1/2长度大于当前最后一行的高度-300，则自动加载
-    // 		//后后台给图片 保证每次给15张，前段不用考虑图片不够用的情况
-    // 		if(height>rowContainer.offsetHeight-300){
-    // 			var index_new=Barrel.prototype.nextIndex;
-    // 			if(index_new>40){index_new=1;}
-    // 			console.log(index_new,'nextIndex');
-    // 			var start=index_new;
-    // 			var end=start+15;
-    // 			var barrel_new=new Barrel(200,'http://journey.crystalxue.com/photo/',start,end,8);
-    // 			barrel_new.getImg();
-    // 			barrel_new.render();
-    // 		}
-
-    // 	}
-    // }
+    window.onload = function() {
+            aside.asideBar();
+            // Barrel.prototype.imgLoad = true; //用于判断上次图片是否加载完成并渲染完成  由于最开始是同步的 因此一定是true
+            console.log(Barrel.prototype.imgLoad);
+            if (Barrel.prototype.imgLoad === true) {
+                var hoverImg = document.getElementsByClassName('hoverImg');
+                var showBox = document.getElementsByClassName('showBox');
+                for (var i = 0; i < hoverImg.length; i++) {
+                    var oImg = hoverImg[i];
+                    oImg.index = i;
+                    oImg.onmouseover = function() {
+                        showBox[this.index].style.height = 50 + 'px';
+                        showBox[this.index].style.opacity = 0.6;
+                        var that = this;
+                        this.onmouseout = function() {
+                            showBox[that.index].style.height = 0 + 'px';
+                            showBox[this.index].style.opacity = 0;
+                        }
+                    }
+                }
+            }
+            mask.method1();
+            var flag = false;
+            window.onscroll = function() {
+                var load = Barrel.prototype.imgLoad;
+                var doc = document;
+                var next = Barrel.prototype.nextIndex;
+                // console.log(next,'next');
+                var boxHeight = document.getElementsByClassName('rowContainer')[0].offsetHeight;
+                var documentHeight = doc.body.scrollTop + doc.documentElement.clientHeight;
+                var flag = documentHeight > (boxHeight - 10) ? true : false;
+                if (flag && load) {
+                    Barrel.prototype.imgLoad = false;
+                    flag = false;
+                    ajax({
+                        "method": "GET",
+                        "url": "/api/getImg",
+                        "data": {
+                            "start": Number(next),
+                            "tag": localStorage["albumTag"]
+                        },
+                        "sync": true,
+                        "success": fn.success2,
+                        "fail": fn.fail1
+                    });
+                }
+            }
+        }
     </script>
 </body>
 

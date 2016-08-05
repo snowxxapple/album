@@ -1,4 +1,4 @@
-.oLink{
+.oLink1,.oLink2{
 	display: block;
 	position: fixed;
 	right: 0px;
@@ -14,7 +14,25 @@
 	padding:3px 0 3px 0;
 	text-decoration:none;
 	border-radius: 4px;
+	z-index: 10;
 }
-.oLink:hover{
+.oLink1:hover,.oLink2:hover{
 	font-weight: bolder;
+}
+.oLink2{
+	display: block;
+	position: fixed;
+	right: 0px;
+	top: 30%;
+	width: 40px;
+	height: 106px;
+	background-color: rgba(8,8,8,0.6);
+	color: white;
+	font-size: 22px;
+	cursor: pointer;
+	text-align: center;
+	padding: 3px 0 3px 0;
+	text-decoration: none;
+	border-radius: 4px;
+	z-index: 10;
 }

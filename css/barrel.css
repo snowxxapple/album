@@ -11,6 +11,7 @@ body{
 }*/
 .imgBox{
 	float:left;
+	position: relative;
 	/*padding-left: 8px;*/
 	border-radius: 4px;
 }
@@ -33,4 +34,18 @@ progress{
 img{
 	border-radius: 4px;
 	cursor:url(../js/img/enlarge2.png),pointer;
+}
+/*.hoverImg:hover{
+	opacity: 0.5;
+}*/
+.showBox{
+	position: absolute;
+	width:100%;
+	height: 0px;
+	bottom:0px;
+	background: white;
+	opacity: 0;
+	font-size: 20px;
+	font-weight: bold;
+	transition:all 0.2s ease-in;
 }

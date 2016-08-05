@@ -4,13 +4,14 @@
 <head>
     <meta charset='utf-8'>
     <title>相册主页</title>
-    <link rel="stylesheet" type="text/css" href="../css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
+    <link rel="shortcut icon" href="../backimg/logo.ico" />
 </head>
 
 <body>
-    <!--  <div class='loadMask'>
-        <progress></progress>
-    </div> -->
+    <div class='loadMask'>
+        <progress value='0'></progress>
+    </div>
     <div class='goTop'><img src="../js/img/arr2.png"></div>
     <div class='typeBox'>
         <span id='typeIn'></span>
@@ -35,32 +36,32 @@
         <img class='snowLg' src='../js/img/snow10.png'></img>
         <div class='nav_ul'>
             <a href="javascript:;" class='line_li' id='show_ul'>相册列表<span class='arrow'></span></a>
-            <a href="/upload.html" class='line_li' id='up_img'>上传相册</a></li>
+            <a href="/html/upload_new.html" class='line_li' id='up_img'>上传相册</a></li>
         </div>
     </nav>
     <div class='drop_ul'>
-        <a href="/waterfall.html" class='vertical_li'>测试相册1</a>
-        <a href="#" class='vertical_li'>测试相册2</a>
-        <a href="#" class='vertical_li'>测试相册3</a>
+        <a href="/html/waterfall.html" class='vertical_li'>瀑布流相册</a>
+        <a href="/html/barrel.html" class='vertical_li'>木桶布局相册</a>
+        <a href="/html/banner.html" class='vertical_li'>轮播图相册</a>
     </div>
     <div class='album'>
         <div class='mask_div'>
         </div>
         <div class='backDiv'>
-            <img src="../backimg/back2.jpg" class='backImg'>
+            <img src="/backimg/back2.jpg" class='backImg'>
         </div>
     </div>
     <div class='album'>
         <div class='first-left'>
-            <img src="../img/8.jpg" class='common_img'>
+            <img src="../backimg/page1.jpg" class='common_img'>
             <div class='des_div'>测试相册1 瀑布流布局</div>
         </div>
         <div class='first-right banner-div'>
             <ul class='banner_ul'>
-                <li><img src="../img/4.jpg" class='banner_img'></li>
-                <li><img src="../img/5.jpg" class='banner_img'></li>
-                <li><img src="../img/6.jpg" class='banner_img'></li>
-                <li><img src="../img/9.jpg" class='banner_img'></li>
+                <li><img src="../backimg/page1.jpg" class='banner_img'></li>
+                <li><img src="../backimg/page2.jpg" class='banner_img'></li>
+                <li><img src="../backimg/page3.jpg" class='banner_img'></li>
+                <li><img src="../backimg/page4.jpg" class='banner_img'></li>
             </ul>
             <div class='banner_btn'>
                 <a href="javascript:;"></a>
@@ -70,42 +71,57 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+    var loadMask = document.getElementsByClassName('loadMask')[0];
+    var oProgress = document.getElementsByTagName('progress')[0];
+    oProgress.value = 0.2;
+    </script>
     <div class='album'>
         <div class='second-left'>
-            <div><img src="../img/8.jpg" class='common_img'>
-                <div class='des_div'>测试相册1 瀑布流布局</div>
+            <div>
+                <img src="../backimg/page6.jpg" class='common_img'>
+                <div class='des_div'>测试相册2 轮播图</div>
             </div>
-            <div><img src="../img/10.jpg"></div>
-            <div><img src="../img/8.jpg" class='common_img'>
-                <div class='des_div'>测试相册1 瀑布流布局</div>
+            <div><img src="../backimg/page3.jpg"></div>
+            <div><img src="../backimg/page4.jpg" class='common_img'>
+                <div class='des_div'>测试相册3 瀑布流布局</div>
             </div>
         </div>
         <div class='second-right'>
-            <img src="../img/7.jpg" class='common_img'>
-            <div class='des_div'>测试相册1 瀑布流布局</div>
+            <img src="../backimg/page5.jpg" class='common_img'>
+            <div class='des_div'>测试相册4 木桶布局</div>
         </div>
     </div>
+    <script type="text/javascript">
+    oProgress.value = 0.4;
+    </script>
     <div class='album'>
-        <div class='third-left'><img src="../img/8.jpg"></div>
-        <div class='third-middle'><img src="../img/10.jpg" class='common_img'>
-            <div class='des_div'>测试相册1 瀑布流布局</div>
+        <div class='third-left'><img src="../backimg/page1.jpg"></div>
+        <div class='third-middle'><img src="../backimg/page2.jpg" class='common_img'>
+            <div class='des_div'>测试相册5 木桶布局</div>
         </div>
-        <div class='third-right'><img src="../img/8.jpg"></div>
+        <div class='third-right'><img src="../backimg/page3.jpg"></div>
     </div>
+    <script type="text/javascript">
+    oProgress.value = 0.6;
+    </script>
     <div class='album'>
         <div class='fourth-left'>
-            <img src="../img/10.jpg">
+            <img src="../backimg/page1.jpg">
         </div>
         <div class='fourth-right'>
-            <img src="../img/11.jpg">
-            <img src="../img/16.jpg">
+            <img src="../backimg/page1.jpg">
+            <img src="../backimg/page2.jpg">
         </div>
     </div>
+    <script type="text/javascript">
+    oProgress.value = 0.8;
+    </script>
     <div class="album">
         <div class='button-box'>
             <div class='link link-more'>
                 <span class='icon'></span>
-                <a href="" class='button'>More
+                <a href="javascript:;" class='button'>More
                     <span class='line line-top'></span>
                     <span class='line line-bottom'></span>
                     <span class='line line-left'></span>
@@ -133,42 +149,46 @@
         </div>
     </div>
     <footer>Copyright&copy;&nbsp;2016小雪</footer>
-    <script type="text/javascript" src='../js/index_new.js'></script>
+    <script type="text/javascript" src='/js/index_new.js'></script>
     <script type="text/javascript">
-    // var imgLoad = document.getElementsByTagName('img');
-    // var countImg = 0;
-    // var loadMask = document.getElementsByClassName('loadMask')[0];
-    // var oProgress = document.getElementsByTagName('progress')[0];
-    // for (var i = 0; i < imgLoad.length; i++) {
-    //     var oImg = imgLoad[i];
-    //     oImg.onload = function() {
-    //         console.log('ok');
-    //         countImg++;
-    //         oProgress.value = countImg / imgLoad.length;
-    //         if (countImg == imgLoad.length) {
-    //             console.log('图片加载完成');
-    //             oProgress.value = 0;
-    //             loadMask.style.display = 'none';
-    //         }
-    //     }
-    // }
+    //页面进来就设置 以防没有点下面图片和别的页面拿不到信息 如果没有信息就设置
+    if (!localStorage['albumTag']) {
+        console.log(localStorage['albumTag']);
+        localStorage.setItem('albumTag', '测试相册');
+    }
     window.onload = function() {
-        var doc = document;
-        var height = doc.documentElement.clientHeight;
-        var obj = doc.getElementsByClassName('album');
-        Album.init(height, obj);
-        var oUl = doc.getElementsByClassName('drop_ul')[0];
-        var oLi_ul = doc.getElementById('show_ul');
-        var oLi_up = doc.getElementById('up_img');
-        var oA_li = oLi_ul.getElementsByTagName('a')[0];
-        var oA_upload = oLi_up.getElementsByTagName('a')[0];
-        var flag = true; //用于表示下拉菜单是否显示 true还未显示 false显示
-        var body = doc.getElementsByTagName('body')[0];
-        body.addEventListener('click', process, false);
-        //click函数处理程序
-        function process(ev) {
-            //drop_ul的显示
-            if (ev.target === oLi_ul || ev.target === oA_li) {
+            var doc = document;
+            var height = doc.documentElement.clientHeight;
+            var obj = doc.getElementsByClassName('album');
+            Album.init(height, obj);
+            var oUl = doc.getElementsByClassName('drop_ul')[0];
+            var oLi_ul = doc.getElementById('show_ul');
+            var oLi_up = doc.getElementById('up_img');
+            var oA_li = oLi_ul.getElementsByTagName('a')[0];
+            var oA_upload = oLi_up.getElementsByTagName('a')[0];
+            var flag = true; //用于表示下拉菜单是否显示 true还未显示 false显示
+            var body = doc.getElementsByTagName('body')[0];
+            //点击图片跳转到对应相册
+            //把要跳转的地址存到一个数组中
+            var albumAdress = ["/html/waterfall.html", "/html/banner.html", "/html/waterfall.html", "/html/barrel.html", "/html/barrel.html"];
+            //相册tag标签 相册名
+            var albumTag = ["测试相册", "测试相册2", "测试相册3", "测试相册4", "测试相册5"];
+            var album_img = document.getElementsByClassName('common_img');
+            //给每个图片添加index
+            for (var k = 0; k < album_img.length; k++) {
+                album_img[k].index = k;
+            }
+            //将处理函数和click的ev.target对应 仿照后台中的时间处理程序写法
+            var handle = {
+                "oLi_ul": "drop",
+                "oA_li": "drop",
+                "oLi_up": "uploadImg",
+                "oA_upload": "uploadImg",
+                "common_img": "turn"
+            };
+            body.addEventListener('click', process, false);
+
+            function drop() {
                 if (flag) {
                     oUl.style.display = 'block';
                     flag = false;
@@ -177,270 +197,288 @@
                     flag = true;
                 }
             }
-            if (ev.target === oLi_up || ev.target === oA_upload) {
+
+            function uploadImg() {
                 window.location = '../html/upload_new.html';
             }
-        }
-        //鼠标指针效果
-        var mouse = document.getElementsByClassName('mouse');
-        var count_move = 5;
-        var move_flag = true;
-        body.onmousemove = function(ev) {
-            move_flag = true; //鼠标移动
-            var oEvent = ev || event;
-            if (count_move > 0) {
-                mouse[count_move].style.left = mouse[count_move - 1].offsetLeft + 'px';　　　　　　 //后一个div跟着前面一个div走，
-                mouse[count_move].style.top = mouse[count_move - 1].offsetTop + 'px';
+
+            function turn(tag) {
+                localStorage.setItem("albumTag", albumTag[tag.index]);
+                console.log(localStorage['albumTag'], 'albumTag');
+                window.location = albumAdress[tag.index];
             }
-            count_move--;
-            if (count_move == 0) {
-                mouse[0].style.left = oEvent.clientX + 'px';　　　　　　　　　　 //第一个div跟着鼠标走；
-                mouse[0].style.top = oEvent.clientY + 'px';
-                count_move = 5;
+            //click函数处理程序
+            function process(ev) {
+                if (ev.target === oLi_ul || ev.target === oA_li) {
+                    drop();
+                }
+                if (ev.target === oLi_up || ev.target === oA_upload) {
+                    uploadImg();
+                }
+                if (ev.target.className === 'common_img') {
+                    turn(ev.target);
+                }
             }
-            move_flag = false; //鼠标停止移动            
-        }
-        //当鼠标不动时 把雪花归位
-        var test_mouse = setInterval(function() {
-            if (!move_flag) {
-                //令后一个等于前一个位置 最多循环五次可以使得所有雪花与第一个位置相同
-                for (var k = 0; k < mouse.length - 1; k++) {
-                    for (var j = mouse.length - 1; j > 0; j--) {
-                        mouse[j].style.left = mouse[j - 1].offsetLeft + 'px';
-                        mouse[j].style.top = mouse[j - 1].offsetTop + 'px';
+            //鼠标指针效果
+            var mouse = document.getElementsByClassName('mouse');
+            var count_move = 5;
+            var move_flag = true;
+            body.onmousemove = function(ev) {
+                    move_flag = true; //鼠标移动
+                    var oEvent = ev || event;
+                    if (count_move > 0) {
+                        mouse[count_move].style.left = mouse[count_move - 1].offsetLeft + 'px';　　　　　　 //后一个div跟着前面一个div走，
+                        mouse[count_move].style.top = mouse[count_move - 1].offsetTop + 'px';
+                    }
+                    count_move--;
+                    if (count_move == 0) {
+                        mouse[0].style.left = oEvent.clientX + 'px';　　　　　　　　　　 //第一个div跟着鼠标走；
+                        mouse[0].style.top = oEvent.clientY + 'px';
+                        count_move = 5;
+                    }
+                    move_flag = false; //鼠标停止移动            
+                }
+                //当鼠标不动时 把雪花归位
+            var test_mouse = setInterval(function() {
+                if (!move_flag) {
+                    //令后一个等于前一个位置 最多循环五次可以使得所有雪花与第一个位置相同
+                    for (var k = 0; k < mouse.length - 1; k++) {
+                        for (var j = mouse.length - 1; j > 0; j--) {
+                            mouse[j].style.left = mouse[j - 1].offsetLeft + 'px';
+                            mouse[j].style.top = mouse[j - 1].offsetTop + 'px';
+                        }
                     }
                 }
-            }
-        }, 10);
-        //轮播
-        var oUl_banner = doc.getElementsByClassName('banner_ul')[0];
-        var banner_box = doc.getElementsByClassName('banner-div')[0];
-        var banner_box_width = banner_box.offsetWidth;
-        var btn_box = doc.getElementsByClassName('banner_btn')[0];
-        Banner.start(banner_box, oUl_banner, btn_box);
-        //鼠标移入特效
-        var des_div = doc.getElementsByClassName('des_div');
-        var common_img = doc.getElementsByClassName('common_img');
-        for (var i = 0; i < common_img.length; i++) {
-            var oImg = common_img[i];
-            oImg.index = i;
-            oImg.onmouseover = function() {
-                des_div[this.index].style.height = 30 + "%";
-                des_div[this.index].style.bottom = -5 + "%";
-                this.style.border = '4px solid white';
-                this.onmouseout = function(ev) {
-                    des_div[this.index].style.height = 0 + '%';
-                    this.style.border = 'none';
+            }, 10);
+            //轮播
+            var oUl_banner = doc.getElementsByClassName('banner_ul')[0];
+            var banner_box = doc.getElementsByClassName('banner-div')[0];
+            var banner_box_width = banner_box.offsetWidth;
+            var btn_box = doc.getElementsByClassName('banner_btn')[0];
+            Banner.start(banner_box, oUl_banner, btn_box);
+            //鼠标移入特效
+            var des_div = doc.getElementsByClassName('des_div');
+            var common_img = doc.getElementsByClassName('common_img');
+            for (var i = 0; i < common_img.length; i++) {
+                var oImg = common_img[i];
+                oImg.index = i;
+                oImg.onmouseover = function() {
+                    des_div[this.index].style.height = 100 + 'px';
+                    des_div[this.index].style.bottom = -6 + 'px';
+                    this.style.border = '4px solid white';
+                    this.onmouseout = function(ev) {
+                        des_div[this.index].style.height = 0 + 'px';
+                        this.style.border = 'none';
+                    }
                 }
-            }
-            var oDes = des_div[i];
-            oDes.index = i;
-            oDes.onmouseover = function() {
-                this.style.height = 30 + "%";
-                this.style.bottom = -5 + "%";
-                common_img[this.index].style.border = "4px solid white";
-                this.onmouseout = function(ev) {
-                    this.style.height = 0 + '%';
-                    common_img[this.index].style.border = 'none';
+                var oDes = des_div[i];
+                oDes.index = i;
+                oDes.onmouseover = function() {
+                    this.style.height = 100 + 'px';
+                    this.style.bottom = -6 + 'px';
+                    common_img[this.index].style.border = "4px solid white";
+                    this.onmouseout = function(ev) {
+                        this.style.height = 0 + 'px';
+                        common_img[this.index].style.border = 'none';
+                    }
                 }
-            }
 
-        }
-        //fourth-left鼠标移入特效
-        var oImg_fourth = document.getElementsByClassName('fourth-left')[0].getElementsByTagName('img')[0];
-        oImg_fourth.onmouseover = function() {
-                console.log('move');
-                this.className = 'plus';
-                this.onmouseout = function() {
-                    this.className = 'minus';
+            }
+            //fourth-left鼠标移入特效
+            var oImg_fourth = document.getElementsByClassName('fourth-left')[0].getElementsByTagName('img')[0];
+            oImg_fourth.onmouseover = function() {
+                    console.log('move');
+                    this.className = 'plus';
+                    this.onmouseout = function() {
+                        this.className = 'minus';
+                    }
                 }
-            }
-            //回到顶部按钮
-        var goTop = document.getElementsByClassName('goTop')[0];
-        var scroll = document.documentElement.scrollTop || document.body.scrollTop;
-        window.onscroll = function() {
-            var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-            if (scrollTop > 50) {
-                goTop.style.display = 'block';
-            } else {
-                goTop.style.display = 'none';
-            }
-        }
-        goTop.onclick = function() {
+                //回到顶部按钮
+            var goTop = document.getElementsByClassName('goTop')[0];
+            var scroll = document.documentElement.scrollTop || document.body.scrollTop;
+            window.onscroll = function() {
                 var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-                setTimeout(function() {
-                    var speed = scrollTop > 100 ? 100 : scrollTop;
-                    window.scrollBy(0, -speed);
-                    scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-                    if (scrollTop > 0) {
-                        setTimeout(arguments.callee, 50);
-                    }
-                }, 50);
-            }
-            //打字效果
-        var typeIn = document.getElementById('typeIn');
-        var s = 'Hello,Welcom to my blog!Hello,Welcom to my blog!';
-        var str = '';
-        var index = 0;
-        var tId = null;
-        var delayTimer = null;
-
-        function start() {
-            typeIn.innerText = '';
-            str = '';
-            tId = setInterval(function() {
-                if (index === s.length + 1) {
-                    clearInterval(tId);
-                    delayTimer = setTimeout(function() {
-                        index = 0;
-                        start();
-                    }, 2000);
+                if (scrollTop > 50) {
+                    goTop.style.display = 'block';
+                } else {
+                    goTop.style.display = 'none';
                 }
-                str = str + s.charAt(index);
-                typeIn.innerText = str;
-                index++;
-            }, 100);
-        }
-        start();
-        //雪花效果
-        var logo = document.getElementsByClassName('logo')[0];
-        var nav_bar = document.getElementsByTagName('nav')[0];
-        var snowSm = document.getElementsByClassName('snowSm');
-        var snowLg = document.getElementsByClassName('snowLg');
-        var snowArr = [
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [158, 40],
-            [169, 23],
-            [180, 20],
-            [158, 30],
-            [172, 35],
-            [150, 70],
-            [180, 30],
-            [174, 50],
-            [193, 60],
-            [150, 48],
-            [150, 70],
-            [180, 30],
-            [185, 28],
-            [150, 48],
-            [174, 50],
-            [130, 84],
-            [193, 60],
-            [186, 68],
-            [218, 92],
-            [140, 76],
-            [145, 90],
-            [185, 50],
-            [190, 64],
-            [155, 60],
-            [180, 80],
-            [140, 100],
-            [200, 92],
-            [190, 96],
-            [230, 120],
-            [170, 120],
-            [180, 130],
-            [200, 76],
-            [210, 94],
-            [180, 102],
-            [185, 123],
-            [160, 135],
-            [210, 132],
-            [210, 125],
-            [240, 145],
-            [190, 163],
-            [280 - 50, 230 - 50],
-            [300 - 50, 176 - 50],
-            [310 - 50, 194 - 50],
-            [280 - 50, 202 - 50],
-            [285 - 50, 223 - 50],
-            [260 - 50, 235 - 50],
-            [310 - 50, 232 - 50],
-            [310 - 50, 225 - 50],
-            [340 - 50, 245 - 50],
-            [290 - 50, 263 - 50],
-            [380 - 100, 330 - 100],
-            [400 - 100, 276 - 100],
-            [410 - 100, 294 - 100],
-            [380 - 100, 302 - 100],
-            [385 - 100, 323 - 100],
-            [360 - 100, 335 - 100],
-            [410 - 100, 332 - 100],
-            [410 - 100, 325 - 100],
-            [440 - 100, 345 - 100],
-            [390 - 100, 363 - 100],
-            [480 - 150, 430 - 150],
-            [500 - 150, 376 - 150],
-            [510 - 150, 394 - 150],
-            [480 - 150, 402 - 150],
-            [485 - 150, 423 - 150],
-            [460 - 150, 435 - 150],
-            [510 - 150, 432 - 150],
-            [510 - 150, 425 - 150],
-            [540 - 150, 435 - 150],
-            [490 - 150, 463 - 150],
-            [580 - 200, 530 - 200],
-            [600 - 200, 476 - 200],
-            [610 - 200, 494 - 200],
-            [580 - 200, 502 - 200],
-            [585 - 200, 523 - 200],
-            [560 - 200, 535 - 200],
-            [610 - 200, 532 - 200],
-            [610 - 200, 525 - 200],
-            [640 - 200, 535 - 200],
-            [590 - 200, 563 - 200],
-            [680 - 250, 630 - 250],
-            [700 - 250, 576 - 250],
-            [710 - 250, 594 - 250],
-            [680 - 250, 602 - 250],
-            [685 - 250, 623 - 250],
-            [660 - 250, 635 - 250],
-            [710 - 250, 632 - 250],
-            [710 - 250, 625 - 250],
-            [740 - 250, 635 - 250],
-            [690 - 250, 390],
-            [730 - 25 - 250, 680 - 25 - 250],
-            [750 - 25 - 250, 652 - 25 - 250],
-            [760 - 25 - 250, 644 - 25 - 250],
-            [730 - 25 - 250, 652 - 25 - 250],
-            [735 - 25 - 250, 673 - 25 - 250],
-            [710 - 25 - 250, 685 - 25 - 250],
-            [760 - 25 - 250, 682 - 25 - 250],
-            [760 - 25 - 250, 675 - 25 - 250],
-            [790 - 25 - 250, 420],
-            [740 - 250, 713 - 325],
-            [725 - 325, 705 - 325],
-            [775 - 325, 677 - 325],
-            [785 - 325, 669 - 325],
-            [755 - 325, 677 - 325],
-            [760 - 325, 698 - 325],
-            [735 - 325, 710 - 325],
-            [785 - 325, 707 - 325],
-            [785 - 325, 700 - 325],
-            [815 - 325, 710 - 325],
-            [390, 350],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30],
-            [150, 30]
-        ];
-        var flag = true; //鼠标离开后再次移入时能否触发移入函数
-        logo.onmouseover = function() {
+            }
+            goTop.onclick = function() {
+                    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                    setTimeout(function() {
+                        var speed = scrollTop > 100 ? 100 : scrollTop;
+                        window.scrollBy(0, -speed);
+                        scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                        if (scrollTop > 0) {
+                            setTimeout(arguments.callee, 50);
+                        }
+                    }, 50);
+                }
+                //打字效果
+            var typeIn = document.getElementById('typeIn');
+            var s = '终于等到您~欢迎来到小雪的照片博物馆~照片一共有三种展示方式，您可以右上方导航栏直接查看三种展示，也可以在下面的展示模块点击进入对应相册，此外，您还可以点击上传照片来给对应相册上传照片~左上角logo有惊喜哦~';
+            var str = '';
+            var index = 0;
+            var tId = null;
+            var delayTimer = null;
+
+            function start() {
+                typeIn.innerText = '';
+                str = '';
+                tId = setInterval(function() {
+                    if (index === s.length + 1) {
+                        clearInterval(tId);
+                        delayTimer = setTimeout(function() {
+                            index = 0;
+                            start();
+                        }, 2000);
+                    }
+                    str = str + s.charAt(index);
+                    typeIn.innerText = str;
+                    index++;
+                }, 100);
+            }
+            start();
+            //雪花效果
+            var logo = document.getElementsByClassName('logo')[0];
+            var nav_bar = document.getElementsByTagName('nav')[0];
+            var snowSm = document.getElementsByClassName('snowSm');
+            var snowLg = document.getElementsByClassName('snowLg');
+            var snowArr = [
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [158, 40],
+                [169, 23],
+                [180, 20],
+                [158, 30],
+                [172, 35],
+                [150, 70],
+                [180, 30],
+                [174, 50],
+                [193, 60],
+                [150, 48],
+                [150, 70],
+                [180, 30],
+                [185, 28],
+                [150, 48],
+                [174, 50],
+                [130, 84],
+                [193, 60],
+                [186, 68],
+                [218, 92],
+                [140, 76],
+                [145, 90],
+                [185, 50],
+                [190, 64],
+                [155, 60],
+                [180, 80],
+                [140, 100],
+                [200, 92],
+                [190, 96],
+                [230, 120],
+                [170, 120],
+                [180, 130],
+                [200, 76],
+                [210, 94],
+                [180, 102],
+                [185, 123],
+                [160, 135],
+                [210, 132],
+                [210, 125],
+                [240, 145],
+                [190, 163],
+                [280 - 50, 230 - 50],
+                [300 - 50, 176 - 50],
+                [310 - 50, 194 - 50],
+                [280 - 50, 202 - 50],
+                [285 - 50, 223 - 50],
+                [260 - 50, 235 - 50],
+                [310 - 50, 232 - 50],
+                [310 - 50, 225 - 50],
+                [340 - 50, 245 - 50],
+                [290 - 50, 263 - 50],
+                [380 - 100, 330 - 100],
+                [400 - 100, 276 - 100],
+                [410 - 100, 294 - 100],
+                [380 - 100, 302 - 100],
+                [385 - 100, 323 - 100],
+                [360 - 100, 335 - 100],
+                [410 - 100, 332 - 100],
+                [410 - 100, 325 - 100],
+                [440 - 100, 345 - 100],
+                [390 - 100, 363 - 100],
+                [480 - 150, 430 - 150],
+                [500 - 150, 376 - 150],
+                [510 - 150, 394 - 150],
+                [480 - 150, 402 - 150],
+                [485 - 150, 423 - 150],
+                [460 - 150, 435 - 150],
+                [510 - 150, 432 - 150],
+                [510 - 150, 425 - 150],
+                [540 - 150, 435 - 150],
+                [490 - 150, 463 - 150],
+                [580 - 200, 530 - 200],
+                [600 - 200, 476 - 200],
+                [610 - 200, 494 - 200],
+                [580 - 200, 502 - 200],
+                [585 - 200, 523 - 200],
+                [560 - 200, 535 - 200],
+                [610 - 200, 532 - 200],
+                [610 - 200, 525 - 200],
+                [640 - 200, 535 - 200],
+                [590 - 200, 563 - 200],
+                [680 - 250, 630 - 250],
+                [700 - 250, 576 - 250],
+                [710 - 250, 594 - 250],
+                [680 - 250, 602 - 250],
+                [685 - 250, 623 - 250],
+                [660 - 250, 635 - 250],
+                [710 - 250, 632 - 250],
+                [710 - 250, 625 - 250],
+                [740 - 250, 635 - 250],
+                [690 - 250, 390],
+                [730 - 25 - 250, 680 - 25 - 250],
+                [750 - 25 - 250, 652 - 25 - 250],
+                [760 - 25 - 250, 644 - 25 - 250],
+                [730 - 25 - 250, 652 - 25 - 250],
+                [735 - 25 - 250, 673 - 25 - 250],
+                [710 - 25 - 250, 685 - 25 - 250],
+                [760 - 25 - 250, 682 - 25 - 250],
+                [760 - 25 - 250, 675 - 25 - 250],
+                [790 - 25 - 250, 420],
+                [740 - 250, 713 - 325],
+                [725 - 325, 705 - 325],
+                [775 - 325, 677 - 325],
+                [785 - 325, 669 - 325],
+                [755 - 325, 677 - 325],
+                [760 - 325, 698 - 325],
+                [735 - 325, 710 - 325],
+                [785 - 325, 707 - 325],
+                [785 - 325, 700 - 325],
+                [815 - 325, 710 - 325],
+                [390, 350],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30],
+                [150, 30]
+            ];
+            var flag = true; //鼠标离开后再次移入时能否触发移入函数
+            logo.onmouseover = function() {
                 if (flag) {
                     flag = false;
 
@@ -501,11 +539,12 @@
                 }
 
             }
-            //鼠标影子特效
 
-
-
-    }
+        }
+        //因此用html顺序执行的特点来完成进度条
+    oProgress.value = 1;
+    loadMask.style.display = 'none';
+    oProgress.value = 0;
     </script>
 </body>
 

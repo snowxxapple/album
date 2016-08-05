@@ -6,6 +6,7 @@
     <title>轮播图展示</title>
     <link rel="stylesheet" type="text/css" href="../css/banner.css">
     <link rel="stylesheet" type="text/css" href="../css/aside.css">
+    <link rel="shortcut icon" href="../backimg/logo.ico" />
 </head>
 
 <body>
@@ -15,6 +16,7 @@
     <script type="text/javascript" src='../js/show.js'></script>
     <script type="text/javascript" src='../js/aside.js'></script>
     <script type="text/javascript">
+    console.log(localStorage['albumTag'],'albumTag');
     var fn = {
         success: function(data) {
             console.log("success");
@@ -39,7 +41,7 @@
         for (var i = 0; i < data.length; i++) {
             imgArr.push(data[i].src);
         }
-        var newArr=imgArr.splice(3,9);
+        var newArr = imgArr.splice(3, 9);
         for (var j = 0; j < newArr.length; j++) {
             var oLi = document.createElement('li');
             var oImg = document.createElement('img');
@@ -52,7 +54,6 @@
                 oProgress.value = count / newArr.length;
                 if (count == newArr.length) {
                     count = 0;
-                    // mask.method1();
                     aside.asideBar();
                     oProgress.style.display = 'none';
                     oUl.appendChild(oFrag);
@@ -69,7 +70,7 @@
         "url": "/api/getImg",
         "data": {
             "start": 1,
-            "tag": "测试相册"
+            "tag": "测试相册2"
         },
         "success": fn.success,
         "fail": fn.fail

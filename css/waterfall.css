@@ -59,3 +59,6 @@ progress{
 	transform:translateX(-50%);
 	display: none;
 }
+.imgContent:hover{
+	opacity: 0.5;
+}

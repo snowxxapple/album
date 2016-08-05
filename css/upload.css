@@ -96,8 +96,10 @@ hr{
 	margin-bottom: 10px;
 }
 .form-control{
-	display: block;
-	width: 100%;
+	display: block;	
+	width:388px;
+	height: 44px;
+	resize:none;/*禁止拖动*/
 	border:1px solid #ccc;
 	border-radius: 4px;
 	box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
