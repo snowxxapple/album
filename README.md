@@ -2,6 +2,9 @@
 
 # 相册主要功能及实现的简单介绍：
 
+[项目地址:https://github.com/snowxxapple/album.git](https://github.com/snowxxapple/album.git)
+[项目展示:http://album.crystalxue.com](http://album.crystalxue.com)
+
 瀑布流展示，木桶布局展示，轮播图展示以及往对应相册内上传照片。
 
 + 其中主页面除了幽灵按钮外自适应；瀑布流自适应；木桶布局没有做自适应；轮播图定位始终居中。
@@ -455,91 +458,4 @@ var test_mouse = setInterval(function() {
 + IE盒模型
 
 + cursor:url(),pointer  备用的鼠标形式一定要写上
-
-
-
-
-
-
-
-
-
-
-
-
-
-no-cache：不使用本地缓存
-
-no-store：禁止浏览器缓存数据
-
-public：允许所有用户缓存
-
-private：只能被终端浏览器缓存
-
-Cache-Control和Expires可以同时设置，但是Cache-Control的优先级高，Cache-Control的使用较广泛。
-
-（2）如果没有命中强缓存，则浏览器会发送一个GET请求去确认缓存中的资源是否可用，如果服务器确认完资源可用，回复304状态好，则浏览器从缓存中获取资源，此次通信只有响应头，没有响应体。若资源不可用则返回新的资源。
-
-（3）下面详细说明，浏览器和服务器是怎么确认缓存资源可以使用。
-
-**第一种：前端：If-Modified-Since字段  后台：Last-Modified字段**
-
-在第一次请求过后，服务器端会返回Last-Modified字段，标识该资源的最后更改时间，当浏览器再次请求该资源时，会发送一个If-Modified-Since字段，该值就为返回的Last-Modified的值，服务器根据收到的If-Modified-Since字段判断是否资源被修改，如果未被修改，则返回304，不返回资源，并且不会返回If-Modified-Since字段
-
-**第二种：前端：Etag  后台：If-None-Match**
-
-Etag在不同服务器上的默认格式不同，如果说一个网站建设在多个服务器上，则从两个服务器的Etag是不同的，导致相同资源在不同服务器上会被判成不同资源，而不能用缓存。因此要配置Etag格式，使得不同服务器上的格式相同。协商过程与第一种一致。这种方法的优先级要高。
- 
-
-## 缓存方面的工作
-
-1. 目前在服务器上设置js和css的缓存时间为1天 回复头中添加了'Cache-Control':'max-age=86400'
-2. max-age=0在request中和response中意义是不同的
-在request中，头部的max-age=0表示强制要求服务器返回新的资源，在response中，头部的max-age=0表示要求浏览器获取资源要先问服务器，服务器如果回复304，则可以使用缓存，否则服务器返回新的资源。**我一直都是F5刷新，所以不能调用缓存，新开窗口就可以**
-3. 浏览器是否缓存资源还与用户的操作有关
-
-+ 要开启缓存 disabled-cache不能勾上
-
-+ 是否用缓存还用用户的操作有关
-
-<table>
-	<tr>
-		<td>用户操作</td>
-		<td>Expires/Cache-Contrl</td>
-		<td>Last-Modified/Etag</td>
-	</tr>
-	<tr>
-		<td>地址栏回车</td>
-		<td>有效</td>
-		<td>有效</td>
-	</tr>
-	<tr>
-		<td>页面链接跳转</td>
-		<td>有效</td>
-		<td>有效</td>
-	</tr>
-	<tr>
-		<td>新开窗口</td>
-		<td>有效</td>
-		<td>有效</td>
-	</tr>
-	<tr>
-		<td>前进、后退</td>
-		<td>有效</td>
-		<td>有效</td>
-	</tr>
-	<tr>
-		<td>F5刷新</td>
-		<td>无效</td>
-		<td>有效</td>
-	</tr>
-	<tr>
-		<td>Ctrl+F5刷新</td>
-		<td>无效</td>
-		<td>无效</td>
-	</tr>
-</table>
-
-## 页面的布局以及样式设置
-
 
