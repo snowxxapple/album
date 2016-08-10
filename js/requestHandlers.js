@@ -9,18 +9,19 @@ function getSource(request, response, pathname) {
     var path_new = "." + pathname;
     fs.readFile(path_new, "utf-8", function(err, file) {
         if (err) {
-            response.writeHead(500, { "Content-Type": "application/x-javascript" });
-            response.end(JSON.stringify(err));
+            response.writeHead(404, { "Content-type": "text/html" });
+            var html = "<html><meta charset='utf-8'><title>404</title><div>请求失败，服务器上没有该资源!</div></html>";
+            response.end(html);
         } else {
             var re1 = /.js/;
             var re2 = /.css/;
             var re3 = /.html/;
             if (path_new.search(re1) != -1) {
-                response.writeHead(200, { 'Content-Type': 'application/x-javascript','Cache-Control':'max-age=86400'});
+                response.writeHead(200, { 'Content-Type': 'application/x-javascript', 'Cache-Control': 'max-age=86400' });
                 response.end(file);
             }
             if (path_new.search(re2) != -1) {
-                response.writeHead(200, { "Content-Type": "text/css",'Cache-Control':'max-age=86400'});
+                response.writeHead(200, { "Content-Type": "text/css", 'Cache-Control': 'max-age=86400' });
                 response.end(file);
             }
             if (path_new.search(re3) != -1) {
@@ -78,24 +79,32 @@ function getImg(request, response, pathname, params) {
     }
 }
 //数据库返回图片src后，前端过来拿图片
-function getImg_new(request, response, pathname, paras, num,path_img) {
-    // console.log(paras,'参数');
-    // console.log(path_img,'path_img');
-    var path_new=paras[0];
-    //返回需要的相册照片    
+function getImg_new(request, response, pathname, paras, num, path_img) {
+    console.log(paras, '参数');
+    if (!paras) {
+        console.log('没有这个资源');
+        response.writeHead(404, { "Content-type": "text/html" });
+        var html = "<html><meta charset='utf-8'><title>404</title><div>请求失败，服务器上没有该资源!</div></html>";
+        response.end(html);
+    } else {
+        // console.log(path_img,'path_img');
+        var path_new = paras[0];
+        //返回需要的相册照片    
         var path_new = "./" + path_new + "/" + num[0];
-        // console.log(path_new, '目标路径');
+        console.log(path_new, '目标路径');
         fs.readFile(path_new, 'binary', function(err, docs) {
             if (err) {
-                response.writeHead(500, { "Content-Type": "text/plain" });
-                response.write(err);
-                response.end();
+                console.log('错误');
+                response.writeHead(404, { "Content-type": "text/html" });
+                var html = "<html><meta charset='utf-8'><title>404</title><div>请求失败，服务器上没有该资源!</div></html>";
+                response.end(html);
             } else {
-                console.log(path_new,'路径');
+                console.log(path_new, '路径');
                 response.writeHead(200, { "Content-Type": "application/x-jpg" });
                 response.end(docs, 'binary'); //一定要以二进制返回，否则会出错
             }
         });
+    }
 }
 //除了相册里面的照片的其他图片
 function showImg(request, response, pathname, paras, num, path_img) {
@@ -103,23 +112,25 @@ function showImg(request, response, pathname, paras, num, path_img) {
     var path = "." + path_img;
     fs.readFile(path, 'binary', function(err, docs) {
         if (err) {
-            response.writeHead(500, { "Content-Type": "text/plain" });
-            response.write(err);
-            response.end();
+            response.writeHead(404, { "Content-type": "text/html" });
+            var html = "<html><meta charset='utf-8'><title>404</title><div>请求失败，服务器上没有该资源!</div></html>";
+            response.end(html);
         } else {
-            response.writeHead(200, { "Content-Type": "text/x-jpg",'Cache-Control':'max-age=86400'});
+            response.writeHead(200, { "Content-Type": "text/x-jpg", 'Cache-Control': 'max-age=86400' });
             response.end(docs, 'binary');
         }
     });
 }
+
 function upload(request, response) {
     var method = request.method;
     var album; //album.json文件
     if (method == 'GET') {
         fs.readFile("./js/album.json", "utf-8", function(err, file) {
             if (err) {
-                response.writeHead(500, { "Content-Type": "application/x-javascript" });
-                response.end(JSON.stringify(err));
+                response.writeHead(500, { "Content-type": "text/html" });
+                var html = "<html><meta charset='utf-8'><title>404</title><div>服务器错误！</div></html>";
+                response.end(html);
             }
             album = file;
             response.writeHead(200, { "Content-Type": "application/x-javascript" });
