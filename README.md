@@ -459,3 +459,261 @@ var test_mouse = setInterval(function() {
 
 + cursor:url(),pointer  备用的鼠标形式一定要写上
 
+----
+
+2016.8.11
+
+# 木桶布局和瀑布流布局的实现
+
+这篇涉及到的文件有：waterfall.html barrel.html waterfall_new.js barrel.js waterfall.css barrel.css mask.css aside.js mask.js aside.css 
+# 1.木桶布局
+
+### 布局特点
+
++ 每行宽度相同，为屏幕宽度
+
++ 每张图片的比例与原图相同
+
++ 每行高度近似
+
++ 每行图片数不同
+
+### 木桶思想：
+
++ html和css部分
+
+行内的图片是float:left布局，因此要给行设置宽度，否则浮动元素超出父元素宽度时会自动换行，因此这里把父元素（行）设置为可视区宽度，且不自适应。图片间距设置imgBox的padding，设置imgRow的marginBottom，设置rowContainer的padding
+
+布局：
+
+```javascript
+
+.rowContainer(外层容器)>.imgRow(每一行)>.imgBox(图片盒子)>img(图片)
+								                       >.showBox(图片信息盒子)
+
+```
+
++ js部分
+
+先依据给定的最小行高，以及图片自身比例，计算出图片缩小后的宽度，以此来确定一行的图片数目，由于一行图片的宽度和与最小行高的比值与屏幕宽度和行高的比值是相同的，因此计算出与屏幕宽度相匹配的新行高，将一行图片的在图片数组中的**起始位置和结束位置以及新行高**作为一个对象存起来，同时。接下来就是渲染了，依照行对象数组，依次生成行、图片，就可以完成木桶布局。
+
+### 整个流程
+
++ 如果localStorage中没有albumTag，则设置为'测试相册'
+
++ ajax GET请求，到/api/getImg去拿图片信息数组，返回数组第一位是下一次图片起始坐标（尽管这里没用，因为会重新设置），同步，发送start:1，tag:localStorage["albumTag"]
+
++ 成功拿到图片信息数组后就是木桶布局的渲染
+
++ 监听页面滚动
+
++ 每一张图片监听mousemove事件
+
++ 异步加载图片，异步，接口相同，发送信息：start:Number(Barrel.prototype.nextIndex)，tag:localStorage['albumTag']
+
+### 出现的问题及解决办法 一些设计解释
+
++ 由于要把图片按比例缩小，因此要获取图片的比例，但是`naturalWidth`在图片没有加载出来之前时是获取不到的，因此采用了图片的`img.onload`事件，为每个图片添加了`onload`事件，并设置一个计数器，每个图片加载完成，就把图片的信息（index,tag,name,src,ratio）添加到数组中，直到所有图片加载完成，组成一个新的图片数组（这个数组与传进来的图片数组顺序可能不同，因为每张图片加载速度的不同，所以入数组的顺序会与接收到的图片数组信息不同），此时再进行接下来的木桶布局的两个步骤。在每张图片加载过程中，可以设置进度条的`value=count/num`。在网上查资料时，说浏览器会缓存图片信息，缓存后就不会再触发图片的onload事件，`但是我实测发现，尽管浏览器缓存了图片，onload事件依然是会触发的`。
+在node.js学习中发现这种计数器方法是解决多异步编程的一种方法，这个计数器叫做哨兵变量，在每个异步函数中都判断这个count值是否满足要求，满足时再进行接下来的同步操作。
+
++ 木桶布局当图片数目不够一行的时候是不会现实的，因此要把本次加载完成的图片的最后一个index加一作为下一次图片开始的头。但是有一个问题由于最终的图片顺序是打乱的，所以我只能找到之前加载过的图片最大index，以此作为下一次开始的index+1，但是这样还是避免不了中间有图片没机会展示，这个可以在图片加载出来之后按照index顺序进行排序来解决，现在没有这么做。
+
++ 由于我的展示是异步加载的，整个布局的最外层大容器是只生成一次就可以的，因此我把createBox单独写了出来
+
++ 页面第一次加载时同步加载的，避免用户在这期间做一些别的事情
+
++ 滚动滚轮异步加载时时异步加载的，这是可以继续放大点击查看图片，但是为了防止本次图片还没加载完，鼠标滚轮又滚动到底部异步加载，因此给了两个标志位来解决：`Barrel.prototype.imgLoad`是用来判断本次图片加载和布局是否完成，`flag`滚动距离和可视区高度是否大于**木桶布局盒子的高度-10**。当着两项都满足时，马上设置`Barrel.prototype.imgLoad`为`false`然后进行ajax异步加载图片、渲染。**注意滚动异步加载时不时滚动到屏幕底部，而是滚动到当前文档的底部。**
+
++ 鼠标移入显示图片信息提示框
+
+这个做的不是很好，我是在每生成一个img时生成了一个div信息框，然后设置div内容为img的信息。设置div的定位为absolute，宽度百分百，高度为0（因为有内容，高度为0内容也会显示），bottom为0，完全透明，为每个图片添加了鼠标移入事件，移入时高度变为50px，透明度为0.6，鼠标移除时在变回初始值。把图片和提示框对应上又用到老办法，给每个图片添加index信息，这样就可以在div数组用相应的img.index找到对应的div。
+
+
+### 核心代码
+
+```javascript
+	var start=0;
+	var end=0;
+	var rowWidth=0;
+	var screenWidth=document.documentElement.clientWidth;
+	var rowHeight=0;
+	var rowArr=[];
+	var width=0;
+	var height=minHeight;
+
+	for(var i=0;i<imgSrc.length;i++){
+		width=height*imgSrc[i].ratio;
+		rowWidth=rowWidth+width;
+		if(rowWidth>screenWidth){
+			rowWidth=rowWidth-imgSrc[i].naturalWidth;
+			rowHeight=minHeight*screenWidth/rowWidth;
+			end=i-1;
+			rowArr.push({"rowHeight":rowHeight,"end":end,"start":start});
+			start=i;
+			rowWidth=width;
+		}
+	}
+
+	for(var j=0;j<rowArr.length;j++){
+		var row=document.createElement('div');
+		row.style.height=rowArr[j].rowHeight+'px';
+		row.style.width=screenWidth+'px';
+			for(var k=rowArr[j].start;k<=rowArr[j].end;k++){
+				var oImg=document.createElement('img');
+				oImg.src=imgSrc[k].src;
+				oImg.style.height=rowArr[j].rowHeight+'px';
+				row.appendChild(oImg);
+			}
+		body.appendChild(row);
+	}
+
+```
+
+### 各个函数功能
+
+构造函数接受三个参数：最小行高 图片数组 图片间距
+
+barrel.js中一共有三个原型上的函数，两个个原型属性
+
++ `Barrel.prototype.create`用于创建加载完成的图片数组，只有`create`函数执行完成后才能执行渲染函数`render`
+
++ `Barrel.prototype.createBox`用于创建外层容器 只在第一次加载页面时才执行
+
++ `Barrel.prototype.render`用于确定每一行的图片数目，每一行的新行高，以及木桶布局的渲染。
+
++ `Barrel.prototype.imgLoad`
+
++ `Barrel.prototype.nextIndex`
+
+# 2.瀑布流布局
+
+### 瀑布流布局特点
+
++ 每列的宽度相同
+
++ 图片比例和原图相同
+
+### 瀑布流布局思想
+
++ html css部分
+
+```javascript
+
+.img-container(外层容器)>.boxContainer(列)>.img-box(图片盒子)>.imgContent(图片)
+														    >.imgInfo(图片描述盒子)
+														    	>.imgTag(相册信息)
+			 											    	>.imgName(图片描述)
+									 
+```									 
+
+外层容器.img-container依照媒体查询改变大小，列.boxContainer左浮动float:left，按照百分比显示宽度，这样可以达到宽度自适应，没有做高度自适应；图片.imgContent块级显示，鼠标移入时改变图片透明度。img宽度是100%显示，块级显示
+**元素没有添加到DOM树中是获取不到高度的**
+
++ js部分(假设4列)
+
+1. 创建外层容器 .img-container
+
+2. 依照输入的列数目，平分外层容器，并以百分比表示；创建对应的列.boxContainer；把列添加到外层容器中，把外层容器添加到body中。
+
+3. 创建图片盒子，把内容添加到盒子中，前4张图片顺次放到各个列中。再接下来的图片，先读取当前四列的高度，将下一张图片放到当前列高最小的那一列中，然后更新列高，再放下一张图片。瀑布流布局会使用完所有图片，所以下一个图片的坐标不需要重新指定，就用后台返回的就可以。
+
+### 整体流程
+
++ 读取localStorage中的相册信息，若没有则设置成'测试相册'
+
++ ajax同步从后台读取图片信息。
+
++ 依据读到的图片信息数组，创建加载完成的图片数组。
+
++ 创建外层容器和列（只在第一次时需要）
+
++ 瀑布流布局
+
++ 监听鼠标滚动事件，滚动到文档底部异步加载，瀑布流布局（此时注意前四张图片的处理与一开始不一样）
+
+### 出现的问题及解决办法 一些设计解释
+
++ 列只创建一次
+
++ 异步加载第二次图片时，不会再向第一次一样顺次放置图片
+
++ 由于图片数组是预加载后的，图片顺序可能不按照index顺序进行排列，所以没有用图片index值来判别是否当前列为空，而是用当前页面中的img数目，当img数目小于列数目时，就直接放入对应列。（只有相册是img）
+
++ 相册图片盒子宽度为100/col+‘%’，相册图片宽度100%显示，但是图片要给高度，否则块级显示的图片是没有高度的，因此图片数组中要有图片的原始宽高比。
+
++ 由于异步加载图片时，每次都生成一个新的实例，但是要继续接着上一次的colHeight来进行布局，所以colHeight应该一直都能访问到，所以定义在了原型上，使得每个实例都能访问到。
+
++ 图片预加载的过程与木桶布局一样，所以这里不再重述，每个图片对象包含四项内容：name,tag,src,ratio
+
++ 把图片添加到容器中以后，要记得更新列高数组。
+
++ 找到列高数组中的最小值的方法Math.min.call(Math,arr)；找到一个值在数组中的位置arr.indexOf(value);
+
++ 鼠标滚动异步加载图片的过程与木桶布局一致，再考虑当前是否滚动满足条件时也要考虑本次图片加载以及渲染是否完成。
+
+
+### 核心代码
+
+```javascript
+
+//创建容器 创建列
+Waterfall.prototype.createCol=function(){
+	var imgContainer=creEle('div');
+	for(var i=0;i<this.col;i++){
+		var boxContainer=creEle('div');
+		boxContainer=100/this.col+'%';
+		imgContainer.appendChild(boxContainer);
+	}
+	body.appendChild(imgContainer);
+}
+//布局
+Waterfall.prototype.render=function(){
+	var colHeight=[];
+	for(var i=0;i<img_arr.length;i++){
+		var imgBox=creEle('div');
+		var oImg=creEle('img');
+		oImg.src=img_arr[i].src;
+		var imgInfo=creEle('div');
+		var imgName=creEle('div');
+		var imgTag=creEle('div');
+		imgInfo.appendChild(imgName);
+		imgInfo.appendChild(imgTag);
+		imgBox.appendChild(oImg);
+		imgBox.appendChild(imgInfo);
+		var showNum=document.getElementByTagName('img');
+		if(showNum<=this.col){
+			boxContainer[i].appendChild(imgBox);
+			oImg.style.height=imgContent.offsetHeight/img_arr[i].ratio+'px';
+			colHeight[i]=boxContainer.offsetHeight;
+		}
+		else{
+			var minIndex=colHeight.indexOf(Math.min.call(Math,colHeight));
+			oImg.style.height=oImg.offsetWidth/img_arr[i].ratio+'px';
+			boxContainer[minIndex].appendChild(imgBox);
+			colHeight[minIndex]=boxContainer[minIndex].offsetHeight;
+		}
+	}
+	Waterfall.prototype.colHeight=colHeight;
+}
+
+```
+
+### 各个函数功能
+
+构造函数Waterfall，接收三个参数（列数目，间距，图片数组）
+
+原型上定义了三个方法两个属性
+
++ `Waterfall.prototype.colHeight=[]`;列高数组
+
++ `Waterfall.prototype.create`创建图片数组，预加载和加载进度条
+
++ `Waterfall.prototype.createCol`创建列和创建最外层容器
+
++ `Waterfall.prototype.render`瀑布流布局
+
++ `Waterfall.prototype.imgLoad`指示当前布局是否完成
+
+
+
+
