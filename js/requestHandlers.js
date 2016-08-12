@@ -55,26 +55,29 @@ function getImg(request, response, pathname, params) {
         //查询数据库，在相应相册中，从start起开始查询
         imgModel.find({ 'tag': tag, 'index': { $gte: start } }, null, { limit: 40 }, function(err, docs) {
             if (err) {
+                console.log('查询数据库失败');
                 response.writeHead(500, { "Content-Type": "application/x-javascript" });
                 response.end(JSON.stringify(err));
-            }
-            if (docs.length < 40) {
-                var length = 40 - docs.length;
-                imgModel.find({ 'tag': tag, 'index': { $gte: 1 } }, null, { limit: length }, function(err, newDocs) {
-                    for (var i = 0; i < newDocs.length; i++) {
-                        docs.push(newDocs[i]);
-                    }
-                    index.push(newDocs[newDocs.length - 1].index);
-                    arr = index.concat(docs); //将最后一个图片的index返回
+            } else {
+                if (docs.length < 40) {
+                    var length = 40 - docs.length;
+                    imgModel.find({ 'tag': tag, 'index': { $gte: 1 } }, null, { limit: length }, function(err, newDocs) {
+                        for (var i = 0; i < newDocs.length; i++) {
+                            docs.push(newDocs[i]);
+                        }
+                        index.push(newDocs[newDocs.length - 1].index);
+                        arr = index.concat(docs); //将最后一个图片的index返回
+                        response.writeHead(200, { 'Content-Type': 'application/x-javascript' });
+                        response.end(JSON.stringify(arr)); //把docs数组对象转化成JSON字符串,不能手动加{}进行转化，无意义
+                    });
+                } else {
+                    index = [start + 40];
+                    arr = index.concat(docs);
                     response.writeHead(200, { 'Content-Type': 'application/x-javascript' });
                     response.end(JSON.stringify(arr)); //把docs数组对象转化成JSON字符串,不能手动加{}进行转化，无意义
-                });
-            } else {
-                index = [start + 40];
-                arr = index.concat(docs);
-                response.writeHead(200, { 'Content-Type': 'application/x-javascript' });
-                response.end(JSON.stringify(arr)); //把docs数组对象转化成JSON字符串,不能手动加{}进行转化，无意义
+                }
             }
+
         });
     }
 }
