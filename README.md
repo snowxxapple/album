@@ -712,6 +712,685 @@ Waterfall.prototype.render=function(){
 
 + `Waterfall.prototype.imgLoad`指示当前布局是否完成
 
+----
+2016-8-13
+---
+title: ajax总结 跨域问题(JSONP postmessage)
+tag: 项目总结
+---
 
+这篇主要写一下ajax。
+
+ajax:无需刷新页面就能从服务器获得数据。核心是XHR对象
+
++ xhr.js
+
++ 跨域问题的解决(以前写过)
+
+# 1.ajax过程
+
++ 声明一个XHR对象 var xhr=new XMLRequest();
+
++ xhr.open('GET'/'POST',url,true/false);启动一个请求以备发送，并不会真正发送请求。第一个参数为请求方式，第二个参数为请求url（GET方法时要把请求参数拼写到url后面），第三个参数为异步或是同步，true为异步，false为同步
+
++ xhr.send(null/数据主体)，当没有数据作为请求主体时必须写null，'GET'方法时就要写null，而'POST'方法就要写成数据主体
+
++ 监测xhr.readyState值和xhr.status值，为了保证兼容性，要在open之前监测这两个值。
+
+### XHR对象的readyState属性，该属性表示当前请求/相应的阶段
+
++ 0：还未open()
+
++ 1：已经open()，还未send（）
+
++ 2：已经send（），还未收到响应数据
+
++ 3：收到部分相应数据
+
++ 4：已经收到所有的响应数据了
+
+可以检测onreadystatechange事件来监测当前的readyState是否为4
+
+### XHR对象的响应数据相关属性
+
++ status:HTTP状态号。status>=200&&status<300||status==304(服务器资源未改变，可以直接用缓存资源)
+
++ statusText:状态号说明
+
++ responseText:服务器返回数据 
+
+### 一个简单的ajax异步过程
+
+```javascript
+var xhr=new XHRHttpRequest();
+xhr.onreadystatechange=function(){
+	if(xhr.readyState==4){
+	if(xhr.status>=200&&xhr.status<300||xhr.status==304){
+			console.log(xhr.responseText);
+		}else{
+		alert('error');
+		}
+	}
+}
+```
+### 自定义HTTP头部信息
+
+xhr.setRequestHeader('myheader','myvalue');
+
+要在open()之后，send()之前设置。一般不要设置浏览器默认的头信息，HTTP头部信息可以参考第一篇总结中的缓存部分。
+
+### 获取HTTP头部信息
+
+xhr.getRequestHeader('headerName');
+
+xhr.getAllRequestHeader();获得所有头部信息
+
+### GET请求
+
+要把请求数据拼接到url地址中，请求参数以键值对的形式拼接到url中，例：http://album.crystalxue.com?name='test'&tag='img'，并且参数的名和值都要进行encodeURIComponent()进行编码。
+
+写一个函数将参数拼接到url中。
+
++ 查看当前url中是否有'?'，如果则用'&'来连接，否则就用'?'来连接。能用三目运算符的就用三目运算符，不要总定义一个flag来判断，我总是喜欢定义一个变量来判断。
+
+```javascript
+function concat(url,name,value){
+	url+=(url.indexOf('?')==-1?'?':'&');
+	url+=encodeURIComponent(name)+'='+encodeURIComponent(value)';
+	return url;
+}
+```
+
+### POST请求
+
+把数据作为主体传入xhr.send(data)中。
+
+对于POST请求，xhr会将序列化后的XML DOM文档序列化后作为请求主体提交到服务器，也可以把任意字符串作为主体提交到服务器。但是服务器对POST请求提交的表单数据必须要解析出有效部分才能用。使用XHR来模仿表单提交：首先将Contect-Type:application/x-www-form-urlencoded，然后将表单数据序列化后再通过XHR对象发送到服务器。
+
+简单说一下表单序列化：（将表单数据拼接成一个字符串，再由浏览器发送给服务器，表单序列化就是将表单数据拼接成字符串的过程）
+
++ 对表单字段的名字和值进行URL编码，使用'&'进行分隔
+
++ 不发送禁用表单字段
+
++ 只发送勾选的单选框和复选框
+
++ 不发送'button'按钮和'reset'按钮
+
++ 多选选择框中的每个选中的值单独一个条目
+
++ 在单击提交按钮提交表单的情况下，也会发送提交按钮
+
++ select元素的值，就是选中的option元素的value特性的值。
+
+**但是XML2级标准出现后，不需要表单序列化了，有一个叫FormData的对象来把表单数据直接序列化成一个字符串，这样浏览器就可以直接发送到服务器了**
+
+#### FormData对象
+
++ FormData的append接受两个参数：键和值，分别对应表单字段的name和对应的value
+
+```javascript
+var data=new FormData();
+data.append('name','value');
+```
+
++ FormData也可以直接把表单元素作为参数，在生成实例时传进去
+
+```javascript
+var data=new FormData(document.forms[0]);//直接把整个表单传进去
+```
+
++ 直接把FormData实例数据传入xhr.send()就可以，并且不用设置HTTP的Contect-Type
+
+xhr.send(data);
+
+### 超时设定
+
+xhr对象上的一个timeout属性
+
+```javascript
+xhr.ontimeout=function(){}
+
+xhr.timeout=1000;
+```
+
+### 进度事件
+
+xhr.upload.onprogress事件是上传事件进度
+
+xhr.onprogress事件是下载进度
+
+在做上传进度条时，开始一直在用xhr.onprogress事件，一直都不对，把xhr对象打出来才发现。
+
++ event.lengthComputable 进度信息是否可用的布尔值
+
++ event.loaded 以接受字节数
+
++ event.total 预期字节数
+
+xhr.onprogress=function(event){
+	if(event.lengthComputable){
+		var percent=event.loaded/event.total;
+	}
+}
+
+xhr.upload.onprogress和xhr.onprogress事件中只有event.loaded(已完成)和event.total(总字节数)，并没有event.position，这一点与书上讲的不同。
+
+此外在下载过程中，如果后台不回复Content-Length，前端的xhr.progress事件中，event.lengthComputable是为false的，且event.total=0;
+
+### xhr对象的属性
+
++ xhr.onabort()在没收到响应之前暂停请求
+
++ xhr.onloadstart
+
++ xhr.onload
+
++ xhr.onloadend
+
++ xhr.onerror
+
++ xhr.onprogress
+
++ xhr.readyState
+
++ xhr.onreadystatechange
+
++ xhr.timeout
+
++ xhr.ontimeout
+
++ xhr.responseText
+
++ xhr.responseType
+
++ xhr.responseXML
+
++ xhr.responseURL
+
++ xhr.status
+
++ xhr.statusText
+
++ xhr.withCredentials
+
++ xhr.upload
+
++ xhr.upload.onabort
+
++ xhr.upload.onloadstart
+
++ xhr.upload.onload
+
++ xhr.upload.onloadend
+
++ xhr.upload.onerror
+
++ xhr.upload.onprogress
+
++ xhr.upload.ontimeout
+
+### 我的项目中的ajax
+
+参考了jQuery的ajax两种设计方式：
+
++ 内部返回————回调函数
+
++ 外部返回————链式调用，声明了一个deffered对象
+
+当然我只会第一种，jQuery花了好大力气写出的deffered对象我还没有拜读，自然也是不会的。
+
+回掉方式的调用示例：
+
+```javascript
+ajax({"method":"GET","sync":false,"url":"","data":{},"success":fn.success,"fail":fn.fail});
+```
+
+直接把函数作为参数传进去，就是回掉函数。
+
++ 设计
+
+ajax接受一个对象，里面有方法(GET/POST)，是否异步，请求url，请求数据，请求成功的函数，请求失败的函数。对GET数据要进行处理拼接到url上；一个上传进度事件。
+
+代码：
+
+```javascript
+var ajax=function(config){
+	var method=config.method.toUpperCase();
+	var sync=config.sync;
+	var url=config.url;
+	var data=config.data;
+	var success=config.success;
+	var fail=config.fail;
+	var postData=null;
+	var progress=config.progress;
+	if(method=='GET'){
+		if(data){
+			for(var props in data){
+				url+=(url.indexOf('?')==-1?"?":"&");
+				url+=encodeURIComponent(props)+'='+encodeURIComponent(data[props]);
+			}
+		}		
+		postData=null;		
+	}
+	if(method=='POST'){
+		postData=data;
+	}
+	var xhr=new XMLHttpRequest();
+	xhr.open(method,url,sync);
+	xhr.onreadystatechange=function(){
+		if(xhr.readyState==4){
+			if(xhr.status>=200&&xhr.status<300||xhr.status==304){
+				var response=JSON.parse(responseText);
+				success(response);
+			}
+			else{
+				var response=JSON.parse(resonseText);
+				fail(response);
+			}
+		}
+
+	}
+	xhr.upload.onprogress=function(evt){
+		if(evt.lengthComputabel){
+			var percentComplete=evt.loaded/evt.total;
+			progress(percentComplete);
+		}
+	}
+	xhr.send(postData);	
+}
+```
+
+# 2.ajax跨域问题
+
+当前页面要请求的资源与当前页面的域名不一样的时候就会发生跨域行为，而导致拿不到资源。但是img标签和script标签是没有这个限制的，因此可以用来解决跨域问题
+
+### script标签解决跨域问题——JSONP(把JSON包在函数中)
+
+思想：就是动态创建一个script标签，标签的src属性就为要请求资源的另一个域，动态生成的script标签是异步加载的，另一个域会返回一个函数调用，而这个函数要在当前域写好
+
+```javascript
+<script>
+	//回调函数的定义
+	function box(json){
+		console.log(json);
+		//todo
+	}
+	function createJS(url){
+		var oScript=document.createElement('script');
+		oScript.src=url;
+		oScript.type='text/javascript';
+		var body=document.getElementsByTagName('body')[0];
+		body.appendChild(oScript);
+	}
+	createJS('http://lnxiaoy.com');
+	createJS('http://lnxiaoy.com?callback=box');//指定回调函数的名字
+</script>
+
+```
+
+**注意的地方**
+
+1. box()就是回调函数
+
+2. 动态创建的script标签就是异步加载的，且在任务队列中，就算是加载完也不会立即执行，要等到当前页面中所有script内容加载完并执行完才会执行，这一点我不是很确定，只是目前实验结果为这样。
+
+### HTML5的postmessage(跨文档消息传递XDM)解决跨域、跨窗口消息传递
+
+window.postMessage的功能是允许程序员跨域在两个窗口/iframe间发送数据信息。与跨域的AJAX很像，但是AJAX是客户端和服务器之间通信，而postMessage是两个客户端之间的通信。
+
+XDM跨文档消息传递，来自不同域的页面之间传递消息，情况如下：
+
++ 当前窗口和新窗口之间的数据传递
+
++ 多窗口之间的数据传递
+
++ 页面与嵌套iframe消息传递 iframe会创建包含另外一个文档的内联框架
+
++ 上面三个问题的跨域数据传递
+
+### postMessage()发送消息
+
+postMessage(data,origin)
+
++ data:要发送的数据，为了兼容浏览器，最好转化成字符串再发送，JSON.stringify()
+
++ origin:指定接受消息的窗口的域
+
+本地
+
+```javascript
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>postmessage测试</title>
+</head>
+<body>
+	<div style="width:200px; float:left; margin-right:200px;border:solid 1px #333;">
+        <div id="color">Frame Color</div>
+    </div>
+    <div>
+        <iframe id="child" src="http://album.crystalxue.com/test.html" style='600px; height:400px;'></iframe>
+    </div>
+<script type="text/javascript">
+	window.onload=function(){
+            window.frames[0].postMessage('hello','http://album.crystalxue.com/test.html');//接受消息的frame上调用postMessage
+        }
+</script>
+</body>
+</html>
+```
+
+是由接受消息的frame调用postMessage()方法的
+
+### 接受消息 window.onmessage/或用事件监听
+
+message事件的事件对象有三个属性：
+
++ e.origin 发送消息的域
+
++ e.data 发送的信息
+
++ e.source window对象的代理
+
+http://album.crystalxue.com/test.html
+
+```javascript
+<!doctype html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>postmessage测试 跨域测试</title>
+</head>
+<body>
+<script type="text/javascript">
+	window.addEventListener('message',function(e){
+		console.log(window.parent);//window
+		console.log(e.source,'source');//window
+		console.log(e.data,'data');//hello
+		console.log(e.origin,'origin');//http://localhost:3000
+	},false);
+</script>
+</body>
+</html>
+```
+
+### 向来自不同域的不同iframe窗口分别传递信息
+
+向哪个窗口发信息，就由哪个iframe来调用postmessage
+
+```javascript
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>postmessage测试</title>
+</head>
+<body>
+    <div style="width:200px; float:left; margin-right:200px;border:solid 1px #333;">
+        <div id="color">Frame Color</div>
+    </div>
+    <div>
+        <iframe id="child1" src="http://album.crystalxue.com/test.html" style='600px; height:400px;'></iframe>
+    </div>
+    <div>
+        <iframe id="child2" src="http://album.crystalxue.com/test.html" style='600px; height:400px;'></iframe>
+    </div>
+    <div>
+        <iframe id="child3" src="http://album.crystalxue.com/test.html" style='600px; height:400px;'></iframe>
+    </div>
+
+<script type="text/javascript">
+    window.onload=function(){
+            //向不同iframe中传递不同信息
+            window.frames[0].postMessage('hello','http://album.crystalxue.com/test.html');//接受消息的frame上调用postMessage
+            window.frames[1].postMessage('1','http://album.crystalxue.com/test.html');
+            window.frames[2].postMessage('2','http://album.crystalxue.com/test.html');
+        }
+</script>
+</body>
+</html>
+```
+
+### 向新窗口发送信息
+
+**注意：**浏览器现在大多数屏蔽了弹出新窗口，因此这种在我浏览器中没有实验成功。
+
+var newWindow=window.open(url,'窗口名','窗口参数设置','是否取代当前窗口的布尔值')
+
+记住一句话：要往哪个窗口发信息就由哪个窗口调用postMessage，并在这个窗口内部监听message事件。
+
++ 发送消息
+
+```javascript
+var newWindow=window.open(url);
+newWindow.postMessage(data,url);
+
+```
+
+其中window.open()会返回一个窗口引用，指向新窗口对象。
+
++ 接受消息
+
+```javascript
+window.addEventListener('message',function(ev){
+	if(ev.origin!='发送源') return;
+	console.log(ev.data);
+	console.log(ev.origin);
+},false);
+```
+
+通常都要检测来的消息是否为当前窗口可以接受的源，如果不是，则不处理数据，避免恶意数据。
+
+### CORS跨源资源共享
+
+通过自定义HTTP头部来告诉服务器当前页面的信息，服务器根据这个头部来决定这个请求是否可以接受。如果服务器认为请求可以接受就回复相同的源信息。但是这个会造成安全问题，阿里面试时是这么说的。
+
+# 3.其他ajax技术
+
+上面ajax是以XHR对象为基础实现的，下面说另外一种实现ajax的方法
+
+### Comet(服务器推送技术)
+
+不需要前端主动请求，而是服务器主动把最新内容推送到浏览器。这种技术非常适合于体育比分和股票行情。
+
+**实现方式：**
+
++ 长轮询
+
++ http流
+
+#### 长轮询
+
+**过程：**
+
+服务端和客户端建立连接后，服务端一直保持连接打开，客户端发起一个到服务端的请求，**服务端不立即应答，而是当有数据发送时才发送**。发送完数据后，客户端关闭本次连接，随即又发起一个新的请求。这一过程持续并不断。轮询是所有浏览器都支持。
+
+#### 流
+
+**过程**
+
+流是整个过程都使用一个http连接。服务端一直保持连接打开，客户端向浏览器发送一个请求，服务端周期性向客户端发送数据。
+
+**实现：**
+
+使用XHR对象来实现，侦听readystatechange事件及监测readyState是否为3来实现。服务器向客户端发送数据，readyState会周期性的变为3，当变为3时，responseText中就会保存接受到的所有数据，此时要比较从什么位置开始接受数据。
+
+```
+function createStreaming(url,progress,finished){
+	var xhr=new XMLHttpRequest();
+	var received=0;//接受数据的长度计数器
+	xhr.open('get',url,true);
+	xhr.onreadystatechange=function(){
+		var result;//接收到的数据
+		if(xhr.readyState==3){
+			result=xhr.responseText.substring(received);//取出本次的数据
+			received=received+result.length;//更新数据长度
+			progress(result);//对接受到的数据进行处理
+		}else if(xhr.readyState==4){
+			finished(xhr.responseText);//成功接收处理
+		}
+	}
+	xhr.send(null);
+	return xhr;
+}
+```
+
+----
+2016-8-13
+---
+title: 遮罩层 侧边固定按钮
+tag: 项目总结
+---
+
+这篇要说的是瀑布流展示的时候点击图片会出现遮罩层显示放大图片，右侧有返回主页面和链接到上传页面的按钮。实现起来比较简单，一个用的是模块模式，一个用的是单例模式
+
+# 1.遮罩层 mask.js mask.css
+
+#### 实现样式和功能：
+
++ 点击图片时，遮罩层显示
+
++ 图片默认以原大小显示，且垂直水平居中显示，以高度最大不能超过屏幕高度来限制图片等比例最大size，图片会自适应屏幕大小。
+
++ 点击遮罩层黑色部分时，遮罩层消失。
+
+#### 实现原理：
+
+mask.js作为一个遮罩层库的形式，动态创建一个div.overMask，动态穿件一个img.showImg，把img添加到div中，再把div添加到body中，设置显示为none，在css中设置img为水平垂直居中。body上监听点击事件，当目标标签为img时（只有图片是img，其余部分没有img），读取target的src属性并把它赋值给img.showImg，并设置img的宽度和高度为图片的本身大小，如果高度超过屏幕，则高度设置为屏幕高度的80%（百分比的高度可以使得图片自适应）
+
+#### 具体实现
+
+##### css设置
+
++ .showImg
+
+fixed定位，垂直居中显示
+
+对于宽度不能确定的元素，当然定位不是static的，可以用left，top值和transform的translateX和translateY来进行垂直居中定位，这种方法很常用，我的项目里用了很多
+
+例：对于一个宽度和高度都固定的元素，水平垂直居中定位
+
+```javascript
+.showImg{
+	width:200px;
+	height:300px;
+	position:absolute;
+	left:50%;
+	top:50%;
+	margin-left:-100px;
+	margin-top:-150px;
+}
+```
+
+例：对于一个宽度和高度都不固定的元素，水平垂直居中定位
+
+```javascript
+.showImg{
+	position:fixed;
+	left:50%;
+	top:50%;
+	transform:translateX(-50%) translateY(-50%);
+}
+```
+
+可以用2D变换主要是因为位移translateX和translageY的百分数是相对于本身大小的，因此和设置margin的原理是相同的
+
++ .overMask
+
+相对于浏览器窗口的位置不变，因此采用了相对于浏览器可视区的fixed定位，并设置left和top值为0，并设置z-index为10，使它浮在整个展示页面上方，定义宽度和高度为屏幕宽度和高度的100%
+
+##### js部分
+
+模块模式——为单例创建私有变量和特权方法（增强型的单例模式），返回共有方法和公有属性。模块模式用了一个返回对象的自执行匿名函数。
+
+模块模式在需要对单例进行初始化，并要维护一些私有变量时非常有用。
+
+**对于图片只要设置宽度和高度中的一个值，图片就会以对应比例的大小显示**
+
+```javascript
+var mask = function() {
+    var doc = document;
+    var body = document.getElementsByTagName('body')[0];
+    var screenWidth = doc.documentElement.clientWidth;
+    var screenHeight = doc.documentElement.clientHeight;
+    var overMask = document.createElement('div');
+    overMask.className = 'overMask';
+    var showImg = document.createElement('img');
+    showImg.className = 'showImg';
+    overMask.appendChild(showImg);
+    doc.body.appendChild(overMask);
+    overMask.style.display = 'none';
+    function show() {
+        //点击事件
+        body.removeEventListener('click', maskShow, false);
+        body.addEventListener('click', maskShow, false);
+
+        function maskShow(e) {
+            // console.log(e.target.className,'e');
+            if (e.target.nodeName.toLowerCase() == "img") {
+                //获取图片
+                var img = e.target;
+                //设置图片标签的src属性
+                showImg.src = img.src;
+                //要限制图片的大小 不能超过屏幕大小
+                var width = showImg.naturalWidth;
+                var height = showImg.naturalHeight;
+                // console.log(width,height);
+                // console.log(screenHeight);
+                //限制大小 不超过屏幕大小
+                if (height >= screenHeight) {
+                    // console.log('true');
+                    showImg.style.height = 80 + "%"; //这样可以自适应
+                    // console.log(showImg.offsetHeight);
+                }
+
+                overMask.style.display = 'block';
+            }
+            if (e.target == overMask) {
+                overMask.style.display = 'none';
+            }
+        }
+    }
+    return {
+        method1: show
+    };
+}();
+```
+
+# 2. 侧边栏按钮
+
+aside.js aisde.css
+
+单例模式（只有一个实例的对象，以对象字面量的形式创建的）
+
+### 实现原理
+
++ 单例模式，使得任何页面都能用（我这里是在progress之前添加元素了，应该写成在body中直接添加，这样拓展性好）
+
++ a标签显示成按钮，block显示，fixed定位，z-index为10，在页面之上。
+
++ 动态生成的按钮
+
+### 代码
+
+```javascript
+var aside={
+	asideBar:function(){
+		var doc=document;
+		var oProgress=doc.getElementsByTagName('progress')[0];
+		var oLink1=document.createElement('a');
+		console.log(oLink1);
+		oLink1.innerHTML='上传图片';
+		oLink1.className='oLink1';
+		oLink1.href='../html/upload_new.html';
+		var oLink2=document.createElement('a');
+		oLink2.innerHTML='返回主页';
+		oLink2.className='oLink2';
+		oLink2.href='../html/index.html';
+		document.body.insertBefore(oLink1,oProgress);
+		document.body.insertBefore(oLink2,oLink1);
+	}
+}
+```
 
 
