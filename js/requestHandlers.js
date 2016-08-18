@@ -41,13 +41,19 @@ function start(request, response, pathname) {
 }
 //从库里获得图片的信息，返回给前端图片的信息，图片加载不是在这里
 function getImg(request, response, pathname, params) {
+    console.log(params, 'params');
+    console.log(typeof params);
+    var re = /^测试相册$|^测试相册2$|^测试相册3$|^测试相册4$|^测试相册5$/; //校验性正则必须加上首尾校验
+    //没有属性和值时，params为{},并不是空对象
     // console.log(params, 'params');
-    if (params["start"] === 'NaN') {
-        console.log('出错啦');
-        response.writeHead(500, { "Content-Type": "application/x-javascript" });
-        response.write('出错啦！');
-        response.end();
-    } else {
+    //params是发送过来的参数，只可能有start和tag，并判断这两个值是否符合要求，所以只要没有这两个值，就是前端的问题
+    if (!params["start"] || !params['tag'] || !Number(params['start']) || params['tag'].search(re) == -1) {
+        console.log('/api/getImg访问出错');
+        response.writeHead(500, { "Content-type": "text/html" });
+        var html = "<html><meta charset='utf-8'><title>404</title><div>别试我的接口了好不？</div></html>";
+        response.end(html);
+    }
+    else {
         var start = Number(params['start']);
         var tag = params['tag'];
         var index = [];
@@ -56,8 +62,9 @@ function getImg(request, response, pathname, params) {
         imgModel.find({ 'tag': tag, 'index': { $gte: start } }, null, { limit: 40 }, function(err, docs) {
             if (err) {
                 console.log('查询数据库失败');
-                response.writeHead(500, { "Content-Type": "application/x-javascript" });
-                response.end(JSON.stringify(err));
+                response.writeHead(500, { "Content-type": "text/html" });
+                var html = "<html><meta charset='utf-8'><title>404</title><div>没有你要显示的东西啦~</div></html>";
+                response.end(html);
             } else {
                 if (docs.length < 40) {
                     var length = 40 - docs.length;
@@ -149,14 +156,14 @@ function upload(request, response) {
         form.on("error", function(err) {
             console.log(err);
             response.writeHead(500, { "Content-Type": "application/x-javascript" });
-            response.end(JSON.stringify(err));
+            response.end(JSON.stringify('出错啦'));
         });
         form.parse(request, function(err, fields, files) {
             console.log(fields, files);
             if (err) {
                 console.log(err);
                 response.writeHead(500, { "Content-Type": "application/x-javascript" });
-                response.end(JSON.stringify(err));
+                response.end(JSON.stringify("出错啦！"));
             } else {
                 // console.log(fields,'fields');
                 // console.log(files,'files');
@@ -201,8 +208,9 @@ function upload(request, response) {
                 //get和post时都读了这个文件 尝试只读一次 但是没成功 先这么读两次
                 fs.readFile("./js/album.json", "utf-8", function(err, file) {
                     if (err) {
-                        response.writeHead(500, { "Content-Type": "application/x-javascript" });
-                        response.end(JSON.stringify(err));
+                        response.writeHead(500, { "Content-type": "text/html" });
+                        var html = "<html><meta charset='utf-8'><title>404</title><div>服务器错误！</div></html>";
+                        response.end(html);
                     }
                     album = file; //json文件都出来是JSON字符串，要把JSON字符串转换成JS对象，才能取到属性值
                     // console.log(album,'album');
@@ -212,8 +220,8 @@ function upload(request, response) {
                 imgModel.find({ "tag": tag }, null, null, function(err, docs) {
                     if (err) {
                         response.writeHead(500, { 'Content-Type': 'text/plain' });
-                        response.write(err);
-                        response.end();
+                        // response.write(err);
+                        response.end('出错啦');
                     }
                     var arr = [];
                     for (var i = 0; i < docs.length; i++) {
