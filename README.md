@@ -1392,5 +1392,613 @@ var aside={
 	}
 }
 ```
+----
+2016-8-13
+---
+title: 轮播图展示
+tag: 项目总结
+---
+
+以前写过轮播图展示模块，项目中就直接拿过来用了，这里再重新写一下，也复习一遍。也是深刻感受到了把功能写成模块的好处，拿来直接就能用。涉及到的文件有：banner.html，banner.css，show.js
+
+# 1.页面功能叙述
+
++ 总是向后台发送请求测试相册2，并且起始坐标永远都是1，但是为了兼顾其他页面，后台总是返回40张图片的，而这种布局不宜展示过多照片，层次感不好，因此前端会自行处理，保留9张图片var newArr=arr.splice(3,9)。
+
++ 对处理后的图片信息数组，对图片进行预加载
+
++ 加载成功后执行轮播图布局和自动轮播
+
+# 2.页面布局
+
+整个轮播模块是一个ul作为外层容器，内部图片承载在li标签中。当然布局是动态生成的。布局动态生成的过程中，由于较多的li避免不了要多次插入ul中，此处采用了文档碎片来优化性能，先把li添加到文档碎片中，再一次性把文档碎片添加到ul中。**动态布局应该添加到模块中，以后再改**
+
+### 布局 banner.css
+
++ ul相对于浏览器垂直水平居中
+
++ li行内块显示，定位为绝对定位，应用transition过渡来达到图片移动效果
+
++ span标签会计元素显示，承载图片作为按钮，z-index设置为100，在所有图片之上，定位为abso
+
++ li内的img宽高都100%显示
+
++ 图片等宽，中间图片高度等于插件高度，且zIndex为1
+
+### 动态生成标签部分
+
+```javascript
+<ul>
+	<li><img src=""></li>
+</ul>
+```
+
+文档碎片部分：
+
+```javascript
+var oFrag=document.createDocumentFragment();
+for(var i=0;i<arr.length;i++){
+	var oLi=document.createElement('li');
+	var oImg=document.createElement('img';)
+	oImg.src=arr[i].src;
+	oFrag.appendChild(oLi);
+}
+oUl.appendChild(oFrag);
+```
+
+### 模块show.js部分
+
+采用了模块模式（增强型单例模式），返回两个方法：method:show(轮播布局)，auto:autoMove(自动播放布局)
+
+#### 总体实现思想
+
++ 所有图片等宽
+
++ 中间图片的高度为插件高度
+
++ 除了中间图片的其他图片left，top，height，zIndex，opacity依照中间图片等差设置，并存入数组
+
++ 左右轮播就是数组信息的右移和左移
+
+#### 详细解释
+
+show(num,showWidth,showHeight,singleWidth)
+
++ 该方法接收4个参数：要显示的图片个数，插件宽度，插件高度，单个图片的宽度。
+
++ 每张图片的宽度是相同的，以中间图片为参考，高度等差减小，zIdex等差减小，left值等差减小，top值等差减小
+
++ 更改每张图片的信息存放到数组中，将数组进行元素进行左移右移操作，再把数组元素依次赋给每张图片。
+
++ 图片右移，相当于数组信息左移，（图片右移相当于左侧图片的信息变成右侧图片信息），所以把数组的第一个元素插入到数组尾部后，再把数组第一个元素删除。
+
++ 图片左移，相当于数组信息右移，把数组的最后一个元素插入到数组头部，再把数组尾部元素删除。
+
+#### 具体实现
+
++ 依据传进来的插件宽度和高度，设置ul的宽度和高度
+
++ 依据传进来的要显示的图片数目，取中间坐标，奇数自然就是中间的数，偶数为中间左侧的数字`var middleIndex=Math.floor(num/2)`
+
++ 设置每个li的宽度为传进来的`singleWidth`
+
++ 给中间的li定位，并设置大小。中间图片水平垂直居中，高度为插件高度`showHeight`
+
+```javascript
+var middle=oLi[middleIndex];
+middle.style.height=showHeight+'px';
+middle.style.left=0.5*(showWidth-singleWidth)+'px';
+```
+
++ 给两个按钮定位
+
+```javascript
+oBtn1.style.left=middle.offsetLeft+'px';
+oBtn2.style.left=middle.offsetLeft+singleWidth-oBtn2.offsetWidth+'px';
+oBtn1.style.top=0.5*(showHeight-oBtn1.offsetHeihgt)+'px';
+oBtn2.style.top=0.5*(showHeight-oBtn2.offsetHeihgt)+'px';
+```
+
++ 确定每张图片之间的差异，定义图片最小高度为200
+
+```javascipt
+var minHeight=200;
+var remain_half=(showWidth-singleWidth)*0.5;
+var speedX=remain_half/middleIndex;//横坐标每次移动位移
+var speedY=(showHeight-minHeight)*0.5/middleIndex;//纵坐标每次移动的位移
+```
+
++ 根据上一步骤中定义的每张图片之间的差距，确定每张图片的大小，位置，zIndex。middle的左侧和右侧分开设置
+
+左侧，从中间向左侧
+```javascript
+var moveX=speedX;
+var moveY=speedY;
+var index=0;
+for(var i=middleIndex-1;i>=0;i--){
+	oLi[i].style.height=showHeight-moveY*2+'px';
+	oLi[i].style.left=middle.offsetLeft-moveX+'px';
+	oLi[i].style.top=moveY+'px';
+	index=inde-1；
+	oLi[i].style.zIndex=index;
+	oLi[i].style.opacity=(i+1)*0.26;//大于1就为1
+	moveX=moveX+speedX;
+	moveY=moveY+speedY;
+}
+```
+
+右侧，从中间向右侧
+
+**注意：**因为图片宽度相同，因此右侧也是加上moveX;
+
+```javascript
+var moveX=speedX;
+var moveY=speedY;
+var index=0;
+for(var i=middleIndex+1;i<num;i++){
+	oLi[i].style.height=showHeight-moveY*2+'px';
+	oLi[i].style.left=middle.offsetLeft+moveX+'px';
+	oLi[i].style.top=moveY+'px';
+	index=index-1;
+	oLi[i].style.zIndex=index;
+	oLi[i].style.opacity=(num-i)*0.26;
+	moveX=moveX+speedX;
+	moveY=moveY+speedY;
+}
+```
+
++ 设置完图片的大小，位置，zIndex，以及opacity之后，将这些信息存入数组
+
+```javascript
+var arr;
+for(var i=0;i<num;i++){
+	arr.push([oLi[i].offsetLeft,oLi[i].offsetTop,oLi[i].offsetHeight,oLi[i].style.zIndex,oLi[i].style.opacity]);
+}
+```
+
++ 自动向右播放
+
+向右，数组信息左移，则第一个元素尾插到最后之后，头删。自动播放，采用定时器，用setTimeout来播放模拟setInterval
+
+```javascript
+function autoMove(){	
+	setTimeout(move,5000);
+	funnction move(){
+		arr.push(arr[0]);
+		arr.shift();
+		for(var i=0;i<arr.length;i++){
+			oLi[i].style.left=arr[i][0]+'px';
+			oLi[i].style.top=arr[i][1]+'px';
+			oLi[i].style.height=arr[i][2]+'px';
+			oLi[i].style.zIndex=arr[i][3];
+			oLi[i].style.opacity=arr[i][4];
+		}
+		setTimeout(arguments.callee,5000);
+	}
+}
+```
+
+递归调用时要用arguments.callee，arguments.callee指向当前正在执行的函数move。
+
++ 左右按钮功能
+
+右移按钮与自动播放的move部分基本完全相同
+
+左按钮：数组信息右移，把数组最后一项插入到数组头部，之后删除数组最后一项
+
+arr.unshift(arr[arr.length-1]);
+arr.pop();
+
+# 3.总结
+
++ 定位部分，画图就可以明确看出来
+
++ 图片的左移右移就是数组信息的右移和左移。
+
++ 图片运动的效果用的是transition
+
++ 因为中间图片的左右图片数目不相同，所以把左右布局分开写了
+
+----
+2016-8-14
+---
+title: 上传文件
+tag: 项目总结
+---
+
+涉及文件：upload_new.html xhr.js
+
+# 1.页面功能
+
++ 从后台加载当前存在的相册
+
++ 选择文件，显示文件路径，file类型的input标签进行了美化，获取file标签会得到file对象
+
++ 文件本地预览 fileReader()，目前还有不足，如果文件过大应该分块上传预览（后期再做吧）
+
++ 给图片添加描述
+
++ 上传文件时显示上传进度 在xhr.js中，在upload_new.html中只是传了一个回调函数进去
+
++ 对前后两次相同文件名的文件有监测提示 input.value是文件名，存入数组比较两个值
+
++ 上传文件有类型检测，文件后缀名只能是图片格式的  /image\/\w+/.test(file.type)
+
+# 2.流程及代码
+
++ 监听<input type='file'>的内容是否改变，若改变则执行readFile函数
+
+```javascript
+input.addEventListener('change',readFile,false);
+```
+
++ readFile()函数
+
+先检测当前file中是否有内容，因为改变可以使由空到有，也可以是由有到空。直接获取file标签，若有内容则是一个File对象，否则为null
+
+```javascript
+file=this.files[0];//获取到file内容
+console.log(file);
+if(file){
+	//todo
+}
+```
+
+直接获取file标签，得到的是一个File对象:
+
+```javascript
+File{
+	"name":选择的文件的名字,
+	"size":字节数,
+	"type":MIME类型
+	"lastModified":上次更改时间,
+	"lastModifiedDate":"**",
+}
+```
+
+因此可以用得到的file对象的type来验证文件的类型，图片类型主要有以下几种：
+
+.jpg .jp2 .jpe .png .tif .tiff .gif
+
+它们的MIME类型格式都为：'image/英文字母拼写'，因此可以用正则来验证文件后缀名是否为图片类型：
+
+```javascript
+/image\/\w+/.test(file.type)
+```
+
+如果文件格式不是图片，则要禁止上传按钮；更改提示信息框的内容，同时弹出模态框（与遮罩层的写法类似）；显示文件路径信息的input[type=text]的内容要为空,txt=value；把获取到的file置为空，并把file的value置空，input[type=file]的value是文件路径。至此，函数返回即可。
+
+```javascript
+oBtn.disabled=true;
+```
+
+禁止<input type='button'>用disabled属性就可以，属性值为布尔值true/false
+
+如果上传的文件是图片格式，则上传按钮设置为可点击，并用fileReader异步加载图片并本地显示，在图片加载完成后，读取图片的本身比例（宽比高），如果宽大于高，则令宽为外层容器的宽度200，高度等比例变化，并在外层容器中动态生成img标签，添加src，并设置img的高度；如果高大于宽，则令高度为外层容器高度，其他与前一种情况设置相同。
+
+整个readFile的代码如下：
+
+```javascript
+  function readFile() {
+            console.log('change');
+            file = this.files[0];
+            // console.log(file, 'file');
+            hide();
+            if (file) {
+                //图片类型：.jpg .jp2 .jpe .png .tif .tiff .gif 
+                //type表现为：image/英文字母拼写
+                if (!/image\/\w+/.test(file.type)) {
+                    oBtn.disabled = true;
+                    msg.innerHTML = '文件必须为图片格式';
+                    oMask.style.display = 'block';
+                    oAlert[0].style.display = 'block';
+                    txt.value = '';
+                    //当上传文件不是图片时，一定要把file对象置空，并且把input的value置空，因为下面使用Input的value值来判断是否上传了文件的
+                    file = null;
+                    input.value = '';
+                    result.innerHTML = "<img src='../js/img/load.png'>";
+                    return false; //返回了函数而已
+                }
+                oBtn.disabled = false;
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(e) {
+                    // console.log(this);
+                    // console.log(e, 'img');
+                    // console.log(e, 'e');
+                    txt.value = input.value;
+                    var img = document.createElement('img');
+                    img.src = this.result;
+                    var that = this;
+                    img.onload = function() {
+                        var ratio = this.naturalWidth / this.naturalHeight;
+                        if (ratio > 1) {
+                            var height = 200 / ratio;
+                            result.innerHTML = "<img src=" + that.result + " style=height:" + height + "px;>";
+                        }
+                        if (ratio <= 1) {
+                            var width = ratio * 200;
+                            result.innerHTML = "<img src=" + that.result + " style=width:" + width + "px;>";
+                        }
+
+                    }
+
+                }
+            }
+        }
+```
+
++ 上传图片
+
+body上监听click事件，改页面有两个提示框，一个上传按钮，都会有click事件。
+
+当点击上传按钮时，为了避免多次点击上传按钮，造成重复提交表单，会在此次上传过程中，禁用提交按钮，直至本次完成。
+
+用file的value来判断当前是否有文件要上传
+
+if(input.value=='')
+
+不为空时，一定是上传了文件，
+
+判断连续两次上传文件是否相同，采用了一个数组，将两次文件名都存放在数组content中，判断两次是否相同。
+
+```javascript
+var filename=input.value;
+content.push(filename);
+if(content.length>2){
+	content.shift();
+}
+if(content[0]!=content[1]){
+	upload();//直接上传
+}
+if(content[0]==content[1]){
+	//显示两次相同的提示框
+}
+```
+
++ upLoad()函数
+
+采用了FormData对表单元素进行序列化发送给后台，详细解释在ajax那一篇中说了，这里就不再写了。上传进度条就在ajax时传一个名为prgress的回调函数，具体在xhr.js中处理。
+
+# 3.实现的详细解释
+
+### html代码
+
+```javascript
+<div class='file-box'>
+	<form enctype='multipart/form-data' name='upImg'>
+		<fieldset>
+			<legend>上传图片</legend>
+			<div class='box_img'>
+				<div id='showImg'>
+					<img src="没有图片时默认显示的图片">
+				</div>
+				<label>预览</label>
+			</div>
+			<div class='form-group'>
+				<label>选测相册：</label>
+				<select id='sele' name='tag'></select>
+			</div>
+			<div class='form-group'>
+				<input type='button' value='选择文件'>
+				<input type='text' readonly='readonly'>
+				<input type='file' name='upload' id='upImg'>
+			</div>
+			<div class='form-group'>
+				<label>添加描述</label>
+				<textarea name='description' class='form-control'></textarea>
+			</div>
+			<div class='form-group'>
+				<input type='button' value='上传'>
+				<progress></progress>
+				<img src="" id='mImg'>
+				<div id='info'></div>
+			</div>
+		</fieldset>
+	</form>
+</div>
+```
+
+### html整体的详细解释
+
++ 在有file类型的input标签时，表单form的enctype必须要设置为`multipart/form-data`
+
++ 只有给表单元素设置name属性的，发送给后台，后台才能看见，后台只会接收有name属性的值，接受数据形式：{name:value}
+
++ input标签的file类型长得不好看，因此定义了一个type=button来模拟file类型中默认的按钮，定义一个type=text，且只读的输入框readonly='readonly'来模拟file类型中默认的文件路径信息显示框
+
++ textarea只有固定了height和width，并且resize:none(不会拖动)，才会固定了textarea的大小，并且不会有右下角拖动按钮
+
++ 起初是使用表单的自动提交功能，直接在form上设置action=url，然后submit直接提交，但是这样感觉用户体验不好，因此改用了ajax异步方法上传图片
+
+### 布局的相关知识
+
+#### form属性
+
++ form是块级元素，会产生前后换行
+
++ accept 表单的MIME类型
+
++ accept-charset 规定服务器可处理的表单数据字符集
+
++ action 规定提交表但是向何处发送表单数据
+
++ autocomplete规定是否启用表单的自动完成功能
+
++ enctype 规定在发送表单数据之前如何对其进行编码
+
+	enctype的值有三种
+
+	application/x-www-form-urlencoded 在发送前编码所有字符（默认）
+
+	multipart/form-data 不对字符编码，在使用包含文件上传的功能时，即type=file，必须使用这个
+
+	text/plain 空格转换为‘+’号，但不对特殊字符编码
+
++ method 规定用于发送form-data的HTTP方法
+
++ name 规定表单的名称
+
++ target 规定在何处打开提交表单后返回的数据，值有blank,self,parent,top,framename
+
++ novalidate 表示表单不验证
+
+#### 表单可以包含的元素标签
+
++ input
+
++ label
+
++ fieldset 将表单元素打包分组，浏览器会以特殊的方式来显示这一组元素
+
++ legend 专门用来给fieldset元素定义标题的
+
++ textarea
+
++ menus
+
+#### input的type值
+
++ button
+
++ file
+
++ checkbox
+
++ radio
+
++ image
+
++ text
+
++ submit
+
++ password
+
++ reset
+
++ hidden
+
+#### 向select中添加option选项
+
+HTML DOM Option对象，代表HTML表单中下拉列表中的一个选项，在HTML表单中，option标签每出现一次，就会创建一个Option对象。
+
+向表单中添加option标签可以用操作DOM元素中的方法，但是这里采用了创建Option对象的方法
+
+```javascript
+for(var props in data){
+	var option=new Option(props,props);
+	oSelect.appendChild(option);
+}
+```
+
+对于一个对象，当不清楚对象中都有哪些属性名时，可以用for in循环来把属性名props以及对应的值value都数出来。
+
+var option =new Option('文本','值');
+<option value='值'>文本</option>
+
+#### 本地图片异步预览
+
+应用了fileReader对象，fileReader对象的事件：
+
++ onloadstart 加载事件开始时触发
+
++ onload 成功加载时触发
+
++ onloadend 加载完成时触发，不一定成功加载
+
++ onloadprogress 加载二进制大对象时才会触发
+
++ onabort 终止文件读取时触发
+
++ onerror 读取错误时触发
+
+fileReader对象的方法:
+
++ abort() 终止当前文件读取
+
++ readAsArrayBuffer(file)二进制大对象进行分块读取时，会把读取的分块数据存储成一个数组流来表示文件数据
+
++ readAsBinaryString(file)将二进制文件读取为二进制字符串
+
++ readAsDataURL(file)将二进制文件读取DataURL
+
++ readAsText(file,[encoding])将二进制文件读取为文本
+
+以上四个方法都没有返回值，结果存在fileReader实例的result里面
+
+#### 介绍一下DataURL
+
+##### 1.DataURL
+
+DataURL协议中，图片被转换为base64编码字符串形式，并存储在URL中，冠以MIME。
+
+例:
+
+<img src="img/1.jpg">
+<img src="data:image/gif;base64,R0lGODlhMwAxAIAAAAAAAP///
+yH5BAAAAAAALAAAAAAzADEAAAK8jI+pBr0PowytzotTtbm/DTqQ6C3hGX
+ElcraA9jIr66ozVpM3nseUvYP1UEHF0FUUHkNJxhLZfEJNvol06tzwrgd
+LbXsFZYmSMPnHLB+zNJFbq15+SOf50+6rG7lKOjwV1ibGdhHYRVYVJ9Wn
+k2HWtLdIWMSH9lfyODZoZTb4xdnpxQSEF9oyOWIqp6gaI9pI1Qo7BijbF
+ZkoaAtEeiiLeKn72xM7vMZofJy8zJys2UxsCT3kO229LH1tXAAAOw==">
+
+##### 2.DataURL的好处：
+
+DataURL与传统的外部资源引用方式不同
+
++ 当访问外部资源很麻烦或受限时
+
++ 当图片是在服务器端动态生成的，每个访问用户显示的都不同
+
++ 当图片体积太小，占用一个HTTP会话不是很值得时
+
+##### 3.不适用的场景：
+
++ DataURL对图片进行编码后，图片体积会变大，是源数据的4/3
+
++ DataURL形式的图片不会被浏览器缓存，这意味着每次这样访问图片都要被下载一次，在这个图片呗大量使用时，会有效率问题
+
+##### 4.在css中使用DataURL
+
+css的url可以为元素指定背景，在css的url中设置DataURL，这样图片是会被浏览器缓存的。这样做的效率要比用图片路径引用外部资源要高，避免了让图片发生一次HTTP请求，还可以被浏览器缓存。
+
+##### 5.本地图片预览的具体代码
+
+```javascript
+var file=input.files[0];
+var reader=new fileReader();
+reader.readAsDataURL(file);
+reader.onload=function(e){
+	img.src=this.result;
+}
+```
+reader.onload事件的结果在reader.result中
+
+#### 上传图片
+
+用FormData()
+
+# 4.总结
+
++ var file=input.files[0]得到File对象，file.type检测类型，file.name，file.size检测是否空。/image\/\w+/
+
++ var file=new fileReader()，file.onload(){this.result;}，DataURL
+
++ xhr.upload.progress
+
++ input[type='file'].value是文件路径
+
++ 要防止表单重复提交 disabled=true
+
++ FormData()表单序列化
+
++ new Option('文本','值')
+
++ 要发送给后台的表单内容一定要设置name属性
+
+
+
+
 
 
